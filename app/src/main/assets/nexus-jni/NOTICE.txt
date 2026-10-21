@@ -1,0 +1,1 @@
+Third-party Rust JNI dependencies; original notices retained below. Declared metadata is not a license grant for Nexus source. CameraX/AndroidX and Kotlin runtime are Apache-2.0 components; their upstream terms also apply. No production distribution approval is implied.

@@ -1,0 +1,14 @@
+.tooling/
+.gradle/
+.kotlin/
+**/build/
+native/target/
+local.properties
+vendor/
+app/src/main/jniLibs/
+app/src/main/assets/sdk-identity.json
+*.apk
+*.keystore
+evidence/*.log
+evidence/*.xml
+tools/__pycache__/

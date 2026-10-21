@@ -1,0 +1,118 @@
+# Nexus External Android Integration Lab
+
+A separate CameraX application and thin Rust JNI consumer of **packaged C ABI 2.9**.
+It has no `nexus-core` dependency and is outside the SDK Cargo workspace. The default
+preview package is accepted; fixture/diagnostic profiles are rejected at load/open.
+There is no production authority or external evidence provider here.
+
+One screen: back-camera preview, Start, Cancel, Finish, Check and SDK progress/results.
+Complete means the SDK's configured quality/capture contract, never identity validity,
+liveness, camera origin, anti-replay or transaction approval. Required-check completeness,
+product eligibility and result ownership validity are displayed separately.
+
+## Build
+
+Requirements: JDK 17, Python 3, Rust 1.99.0 + aarch64-linux-android, Android platform 35,
+build-tools 35.0.0 and NDK 27.2.12479018; Gradle 8.13 wrapper. Set `ANDROID_HOME` and
+optionally `ANDROID_NDK_HOME`, with the NDK clang binaries on PATH. The wrapper and
+direct Maven/Cargo dependency versions are pinned; Cargo.lock is committed. Do not put this lab in
+nexus-sdk or add it to the SDK Cargo workspace.
+
+```sh
+rustup target add aarch64-linux-android
+./tools/prepare_sdk.sh ../nexus-sdk dist/android-lab-NEW-UNUSED-NAME
+./tools/build_android.sh
+```
+
+`prepare_sdk` uses the SDK's source-bound xtask packaging/audit, then imports its exact
+library, header, notices and dependency licenses. `SDK_IDENTITY.json` records the source
+SHA/digest, target/profile, header/manifest/library hashes. Generated Rust declarations
+come solely from that header and fail closed on unknown C syntax. Cargo links
+`libnexus_sdk.so`, not SDK Rust crates. SDK package paths and native artifacts are ignored.
+Build assets bind the bridge/library hashes; Android hashes the extracted files and
+loads those exact absolute paths before opening a session. These hashes identify build
+bytes, not signed provenance or execution/hardware attestation.
+
+Release APK: `app/build/outputs/apk/release/app-release.apk`. Debug APK is also built; device instrumentation targets the signed lab release APK itself. **Lab release uses the local Android debug signing key for installation**;
+it is not a production release/distribution certificate. Both package a release Rust
+bridge and the same release SDK. No signing key is committed. Notices/licenses from
+the SDK package and JNI dependencies are included in APK assets, with their original terms.
+
+```sh
+export ANDROID_SERIAL=YOUR_AUTHORIZED_DEVICE
+./tools/device_tests.sh
+adb -s "$ANDROID_SERIAL" install -r app/build/outputs/apk/release/app-release.apk
+adb -s "$ANDROID_SERIAL" shell am start -n org.nexus.lab/.MainActivity
+```
+
+Grant Camera permission when testing capture. The app requests it normally and shows
+refusal without processing when denied. Xiaomi may require Install via USB plus an
+on-device installation confirmation. The test script grants CAMERA to this lab only. Keep the phone unlocked; the foreground
+lab keeps its own window awake and does not dismiss or bypass the keyguard.
+On MIUI, if instrumentation cannot open the Activity because background launch is denied,
+run `NEXUS_SHELL_LAUNCH=1 ./tools/device_tests.sh`. This uses the same public launcher
+intent through ADB when the camera test starts; it changes no device permission or keyguard setting.
+Use a textured, non-sensitive scene for capture; no face is required or recorded.
+
+## Frame, clock and lifecycle contract
+
+- Pinned CameraX 1.4.2 uses output RGBA_8888. The API contract is increasing bytes
+  **R,G,B,A**; the older analysis guide's A,R,G,B example conflicts with the API/source.
+  This lab follows the API and tests colored/asymmetric patterns. It does not reinterpret
+  Bitmap integer order or pass an unknown-range Y plane as full-range luma.
+- CameraX converts to opaque, straight eight-bit RGB. SDK RGBA full-range RGB is
+  converted by the core's existing integer BT.601 approximation. This is RGB-derived
+  quality luma, not a calibrated raw sensor luminance or proof of sensor range.
+- Adapter duplicates the plane buffer, respects position/limit/row stride, requires
+  pixel stride 4 and checks the final address. Source-axis crop is explicitly copied to
+  a single bounded, worker-owned direct RGBA buffer (<=16 MiB). SDK receives packed
+  cropped dimensions and whole ROI. Source crop/size/rotation changes stop the capture;
+  a new Start uses a new session/context.
+- Output rotation in CameraX is disabled. The core applies imageInfo rotation once.
+  Back camera only: analysis bytes are not mirrored, metadata mirrored=false. PreviewView
+  applies its own display transform; preview orientation never transforms analysis twice.
+- KEEP_ONLY_LATEST; one analyzer executor off the main thread. ImageProxy closes in
+  finally. Synchronous JNI enforces position=0 and limit=exact payload on the prepared direct copy,
+  while its owner remains
+  alive; the core makes its own bounded normalized copy. Lab buffer is wiped afterward
+  and on cleanup. One zeroed buffer is reused across captures by the controller and
+  released after its worker drains at activity destruction (direct-memory reclamation
+  remains JVM-managed). There is no persistence/logging of images; CameraX/OS buffer wiping
+  is outside this lab's control.
+- Camera timestamp is checked for positive/increasing ordering only. Sampling cadence,
+  span, maximum gap and capture deadline use the SDK's internal monotonic clock. Lab
+  capture v2: min 5, distinct 3, interval 100ms, span 400ms, window 32, max 256 submissions,
+  duration 15s, max gap 1500ms. Fingerprint diversity means different bytes only.
+- A UI epoch blocks late result publication after cancel/stop/rotation. Cancellation may
+  signal in-flight SDK work immediately; releases are queued behind the worker. Last
+  result is held for Check until Stop/Start/close, then all handles are released. Finish
+  can yield valid Incomplete; validity never promotes a negative decision to Complete.
+  onStop unbinds the camera, cancels and clears current use. Foreground requires Start.
+
+## Measurements and verification
+
+Last 512 analyzer samples, exact nearest-rank p50/p95, separately: adapter copy, JNI/SDK
+submit (including JSON serialization), entire analyzer including wipe/close. Finalization,
+UI dispatch and preview rendering are outside analyzer timing. Actual source/crop dimensions
+and rotation accompany values; timing windows are per capture. CameraX does not expose an
+exact KEEP_ONLY_LATEST drop count: show **UNKNOWN**, plus delivered/submitted/app-skipped/
+error counters, rather than inventing drops from timestamps. Timings are not additive
+exclusive costs and are not extrapolated from Linux to Android.
+
+Unit tests exercise crop/padding/buffer positions, known channels, bounds and wiping.
+Device tests load the actual ARM64 library, verify exact luma/digests across all rotations,
+real SDK-clock sampling/validation, stale/invalid buffers, repeated cleanup, then real
+CameraX at portrait/reverse portrait, lifecycle cancel/restart and close during SDK work.
+Tests emit only identity/counter/quality/timing metadata. Host layout/JVM JNI smoke is a
+separate Linux check (`tools/host_jni.sh`), never Android/camera evidence.
+
+Actual results and remaining blockers are recorded in [docs/VALIDATION.md](docs/VALIDATION.md).
+No open-source license grant for Nexus source is implied by this lab. Imported third-party
+notices retain their terms. AI/models, secured fixture enrollment, platform attestation,
+production issuer/witness, customer backends and fintech apps remain out of scope.
+
+Official references:
+- https://developer.android.com/reference/androidx/camera/core/ImageAnalysis#OUTPUT_IMAGE_FORMAT_RGBA_8888
+- https://developer.android.com/reference/androidx/camera/core/ImageProxy.PlaneProxy
+- https://developer.android.com/media/camera/camerax/analyze
+- https://developer.android.com/training/camerax/orientation-rotation

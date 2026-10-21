@@ -1,0 +1,1 @@
+Nexus SDK developer preview. Production enrollment is unavailable. No fixture trust anchor/model included. SPDX metadata does not grant SDK distribution rights; complete license-text/legal review remains blocked.

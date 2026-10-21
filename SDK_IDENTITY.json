@@ -1,0 +1,11 @@
+{
+  "source_sha": "fce252b5a74614b645f4887c8c503d6f2ddf995c",
+  "source_digest": "50475c4797b7f95888bd670e0cb02e066e4ebea92e839cc80914e6b5932a506c",
+  "target": "aarch64-linux-android",
+  "profile": "default-preview",
+  "abi": "2.9",
+  "exports": 58,
+  "sdk_sha256": "43de126fd7986a4856582d7b997ade5b9fbb9ddd9aebbec0bd093c215053fd85",
+  "header_sha256": "781882be706cb85850f2efe3a286317d4efa5db243d9bde48865571af97f4888",
+  "package_manifest_sha256": "9f39917f39bdbae4b112a5ae355a884445ffa165ac6d173237c0d02713e64b79"
+}

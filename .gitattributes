@@ -1,0 +1,7 @@
+* text=auto
+# Preserve imported SDK legal texts/header exactly, including upstream whitespace.
+app/src/main/assets/nexus-sdk/** -text
+native/include/nexus_v2.h -text
+gradle/wrapper/gradle-wrapper.jar -text
+gradlew.bat text eol=crlf
+app/src/main/assets/nexus-jni/** -text
