@@ -1,5 +1,14 @@
 [
   {
+    "name": "base64",
+    "version": "0.22.1",
+    "declared_license": "MIT OR Apache-2.0",
+    "files": [
+      "base64-0.22.1/LICENSE-APACHE",
+      "base64-0.22.1/LICENSE-MIT"
+    ]
+  },
+  {
     "name": "bytes",
     "version": "1.12.1",
     "declared_license": "MIT",

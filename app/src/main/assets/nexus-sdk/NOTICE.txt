@@ -1,1 +1,1 @@
-Nexus SDK developer preview. Production enrollment is unavailable. No fixture trust anchor/model included. SPDX metadata does not grant SDK distribution rights; complete license-text/legal review remains blocked.
+ISOLATED STAGING ENROLLMENT. Build-pinned issuer public key; no fixture keys or production enrollment. No durable restart guarantee, sensor provenance or liveness. Private issuer key never ships.

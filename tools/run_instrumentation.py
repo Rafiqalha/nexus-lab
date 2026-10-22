@@ -17,7 +17,7 @@ with Path("build/device-instrumentation.log").open("w") as output:
         output.flush()
         if line.startswith("INSTRUMENTATION_STATUS: test="):
             current_test = line.split("=", 1)[1].strip()
-        if launch and line.strip() == "INSTRUMENTATION_STATUS_CODE: 1" and current_test.startswith("realCamera"):
+        if launch and line.strip() == "INSTRUMENTATION_STATUS_CODE: 1" and current_test.startswith(("realCamera", "securedStaging")):
             # Same public launcher intent used by ActivityScenario. Does not grant an
             # OEM background-launch permission, change keyguard, or change app code.
             result = subprocess.run(adb + ["shell", "am", "start", "-W", "-a",

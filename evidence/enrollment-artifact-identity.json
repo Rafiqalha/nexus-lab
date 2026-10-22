@@ -1,0 +1,24 @@
+{
+  "apk_sha256": "11169ceec140fd5556fd3bfc15dbcf47e6ffb2c4e66670d9967459e76a69812a",
+  "native_apk_and_installed_match": true,
+  "installed_native_sha256": {
+    "libnexus_sdk.so": "d57cae416e4e17c8ea79290949015e6c17f4ccb73e85a81b152982091cd9f26a",
+    "libnexus_lab.so": "f6843a4d36414fde323fddb1802dd0d5afb3e125cdc97e0b5ae1899a3a0042d2"
+  },
+  "identity": {
+    "source_sha": "ad41f5fde927de5eed2c9d7a104bc67fc22b8fb6",
+    "source_digest": "06e935cf29c7f4c4cfd00ff75168cbad7884a98cf25db2eb912148d4ff0d6006",
+    "target": "aarch64-linux-android",
+    "staging_root_public_key": "36f931c634f728780664d725c0c819665f23249380c9069ae360b02bf9a5f883",
+    "profile": "staging-enrollment",
+    "abi": "2.10",
+    "package_directory": "vendor/android-arm64-staging-d57cae416e4e",
+    "exports": 58,
+    "sdk_sha256": "d57cae416e4e17c8ea79290949015e6c17f4ccb73e85a81b152982091cd9f26a",
+    "header_sha256": "8b45a3b30cc3062a1ef1df16a32327d1e205f0894420942d191925f2cc3086a6",
+    "package_manifest_sha256": "d57be7e00f5e149c95242f1f40630db91bdd4abbef99003cb138091fa06cda00",
+    "bridge_sha256": "f6843a4d36414fde323fddb1802dd0d5afb3e125cdc97e0b5ae1899a3a0042d2"
+  },
+  "signature": "apksigner verify PASS; debug-key staging signing; not production distribution",
+  "alignment": "zipalign -c -P 16 4 PASS"
+}

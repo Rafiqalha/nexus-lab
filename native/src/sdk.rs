@@ -1,4 +1,83 @@
-// Generated from packaged header SHA256 781882be706cb85850f2efe3a286317d4efa5db243d9bde48865571af97f4888. Do not hand-edit.
+// Generated from packaged header SHA256 8b45a3b30cc3062a1ef1df16a32327d1e205f0894420942d191925f2cc3086a6. Do not hand-edit.
+#[derive(Clone, Copy)]
+#[repr(C)]
+pub struct NexusV2Bytes {
+    pub data: *const u8,
+    pub len: u64,
+}
+#[derive(Clone, Copy)]
+#[repr(C)]
+pub struct NexusV2SignedDocument {
+    pub bytes: NexusV2Bytes,
+    pub signature: NexusV2Bytes,
+}
+#[derive(Clone, Copy)]
+#[repr(C)]
+pub struct NexusV2BootstrapChallenge {
+    pub struct_size: u32,
+    pub version: u32,
+    pub bootstrap_id: u64,
+    pub max_age_ms: u32,
+    pub nonce_len: u32,
+    pub nonce: [u8; 64],
+    pub reserved: [u32; 4],
+}
+#[derive(Clone, Copy)]
+#[repr(C)]
+pub struct NexusV2PlatformChallenge {
+    pub struct_size: u32,
+    pub version: u32,
+    pub session: u64,
+    pub generation: u64,
+    pub nonce: [u8; 32],
+    pub max_age_ms: u32,
+    pub reserved: [u32; 3],
+}
+#[derive(Clone, Copy)]
+#[repr(C)]
+pub struct NexusV2ProvisioningRequest {
+    pub struct_size: u32,
+    pub version: u32,
+    pub config: NexusV2SignedDocument,
+    pub policy: NexusV2SignedDocument,
+    pub response: NexusV2SignedDocument,
+    pub state_kind: u32,
+    pub reserved_flags: u32,
+    pub state: NexusV2SignedDocument,
+    pub reserved: [u32; 4],
+}
+#[derive(Clone, Copy)]
+#[repr(C)]
+pub struct NexusV2SecurityConfiguration {
+    pub struct_size: u32,
+    pub version: u32,
+    pub package_manifest: NexusV2SignedDocument,
+    pub package_payload: NexusV2Bytes,
+    pub license: NexusV2SignedDocument,
+    pub time_kind: u32,
+    pub platform_kind: u32,
+    pub time: NexusV2SignedDocument,
+    pub platform: NexusV2SignedDocument,
+    pub challenge: NexusV2Bytes,
+    pub scope: NexusV2Bytes,
+    pub reserved: [u32; 4],
+}
+#[derive(Clone, Copy)]
+#[repr(C)]
+pub struct NexusV2AuthorityCheckpoint {
+    pub struct_size: u32,
+    pub version: u32,
+    pub state_epoch: u64,
+    pub min_trust_revision: u64,
+    pub min_policy_revision: u64,
+    pub min_package_sequence: u64,
+    pub min_unix_ms: u64,
+    pub provisioning_status: u32,
+    pub continuity_status: u32,
+    pub policy_digest: [u8; 32],
+    pub reserved: [u32; 4],
+}
+#[derive(Clone, Copy)]
 #[repr(C)]
 pub struct NexusV2FrameInput {
     pub struct_size: u32,
@@ -20,6 +99,7 @@ pub struct NexusV2FrameInput {
     pub roi_height: u32,
     pub reserved: [u32; 4],
 }
+#[derive(Clone, Copy)]
 #[repr(C)]
 pub struct NexusV2CaptureConfigV2 {
     pub struct_size: u32,
@@ -35,6 +115,7 @@ pub struct NexusV2CaptureConfigV2 {
     pub max_sample_gap_ms: u32,
     pub reserved: [u32; 3],
 }
+#[derive(Clone, Copy)]
 #[repr(C)]
 pub struct NexusV2CaptureProgress {
     pub struct_size: u32,
@@ -81,6 +162,7 @@ pub struct NexusV2CaptureProgress {
     pub product_eligible: u32,
     pub reserved: [u32; 4],
 }
+#[derive(Clone, Copy)]
 #[repr(C)]
 pub struct NexusV2CaptureProgressV2 {
     pub struct_size: u32,
@@ -98,6 +180,7 @@ pub struct NexusV2CaptureProgressV2 {
     pub observation_span_ms: u64,
     pub reserved: [u32; 2],
 }
+#[derive(Clone, Copy)]
 #[repr(C)]
 pub struct NexusV2ProcessingCapabilities {
     pub struct_size: u32,
@@ -109,6 +192,27 @@ pub struct NexusV2ProcessingCapabilities {
 }
 unsafe extern "C" {
     pub fn nexus_v2_abi_version() -> u32;
+    pub fn nexus_v2_authority_checkpoint(
+        handle: u64,
+        out: *mut NexusV2AuthorityCheckpoint,
+        out_size: u32,
+    ) -> i32;
+    pub fn nexus_v2_authority_provision(
+        domain: u32,
+        challenge_handle: u64,
+        request: *const NexusV2ProvisioningRequest,
+        out: *mut u64,
+    ) -> i32;
+    pub fn nexus_v2_authority_release(handle: u64) -> i32;
+    pub fn nexus_v2_bootstrap_challenge_create(
+        config_id: NexusV2Bytes,
+        scope: NexusV2Bytes,
+        max_age_ms: u32,
+        challenge_out: *mut u64,
+        out: *mut NexusV2BootstrapChallenge,
+        out_size: u32,
+    ) -> i32;
+    pub fn nexus_v2_bootstrap_challenge_release(handle: u64) -> i32;
     pub fn nexus_v2_build_profile() -> u32;
     pub fn nexus_v2_capture_cancel(h: u64) -> i32;
     pub fn nexus_v2_capture_create_v2(
@@ -141,7 +245,18 @@ unsafe extern "C" {
         out: *mut NexusV2ProcessingCapabilities,
         size: u32,
     ) -> i32;
+    pub fn nexus_v2_session_configure_security(
+        handle: u64,
+        authority_handle: u64,
+        request: *const NexusV2SecurityConfiguration,
+    ) -> i32;
     pub fn nexus_v2_session_create(timeout_ms: u32, out: *mut u64) -> i32;
+    pub fn nexus_v2_session_create_secured(timeout_ms: u32, out: *mut u64) -> i32;
     pub fn nexus_v2_session_destroy(handle: u64) -> i32;
     pub fn nexus_v2_session_initialize(handle: u64) -> i32;
+    pub fn nexus_v2_session_platform_challenge(
+        session: u64,
+        out: *mut NexusV2PlatformChallenge,
+        size: u32,
+    ) -> i32;
 }

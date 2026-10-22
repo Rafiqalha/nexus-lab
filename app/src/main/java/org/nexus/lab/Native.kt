@@ -17,11 +17,14 @@ object Native {
     @JvmStatic external fun cancel(capture: Long): Int
     @JvmStatic external fun release(session: Long, capture: Long, result: Long): Int
     @JvmStatic external fun capabilities(session: Long): String
+    @JvmStatic external fun stageBegin(): String
+    @JvmStatic external fun stageComplete(session: Long, challenge: Long, bundle: String): String
+    @JvmStatic external fun stageAbort(session: Long, challenge: Long): Int
     private var identity: String? = null
     @Synchronized fun load(context: Context): String {
         identity?.let { return it }
         val record = JSONObject(context.assets.open("sdk-identity.json").bufferedReader().use { it.readText() })
-        check(record.getString("profile") == "default-preview")
+        check(record.getString("profile") == if (BuildConfig.NEXUS_STAGING) "staging-enrollment" else "default-preview")
         check(Build.SUPPORTED_ABIS.contains("arm64-v8a")) { "ARM64 device required" }
         val directory = File(context.applicationInfo.nativeLibraryDir)
         val sdk = File(directory, "libnexus_sdk.so")

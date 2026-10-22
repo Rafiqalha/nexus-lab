@@ -9,7 +9,7 @@
 
 #define NEXUS_V2_ABI_MAJOR 2
 
-#define NEXUS_V2_ABI_MINOR 9
+#define NEXUS_V2_ABI_MINOR 10
 
 #define NEXUS_V2_STRUCT_VERSION 1
 
@@ -437,7 +437,8 @@ typedef struct NexusV2PlatformAssessment {
   uint32_t struct_size;
   uint32_t version;
   /**
-   * 0 unavailable, 1 authenticated fixture legacy, 2 authenticated fixture claims, 3 unverified host, 4 unsupported raw.
+   * 0 unavailable, 1 fixture legacy, 2 fixture claims, 3 unverified host, 4 unsupported raw,
+   * 5 authenticated isolated staging claims (never production or camera provenance).
    */
   uint32_t authenticity;
   /**
@@ -508,13 +509,15 @@ int32_t nexus_v2_analyze(uint64_t handle,
 int32_t nexus_v2_product_eligibility(uint64_t handle);
 
 /**
- * Bit 0 quality preview; bit 1 secured API boundary; bit 2 fixture authority build.
+ * Bit 0 quality preview; bit 1 secured API boundary; bit 2 fixture authority build;
+ * bit 3 isolated staging-enrollment build (not production).
  * No bit authorizes production enrollment, replay verdicts or product evidence.
  */
 uint64_t nexus_v2_capabilities(void);
 
 /**
- * Build profile 0 default, 1 fixture, 2 diagnostic regression. None enrolls production trust.
+ * Build profile 0 default, 1 fixture, 2 diagnostic regression, 3 isolated staging enrollment.
+ * None enrolls production trust; staging requires an explicit build-pinned issuer public key.
  */
 uint32_t nexus_v2_build_profile(void);
 
@@ -553,7 +556,8 @@ int32_t nexus_v2_authority_release(uint64_t handle);
 /**
  * # Safety
  * Request/header and all advertised byte ranges remain readable and immutable.
- * No trust boolean: platform kind 2 is legacy context, kind 3 signed app/device claims (TEST ONLY).
+ * No trust boolean: platform kind 2 is fixture legacy context, 3 fixture claims,
+ * 4 isolated staging enrollment claims. Document kinds cannot cross authority domains.
  */
 int32_t nexus_v2_session_configure_security(uint64_t handle,
                                             uint64_t authority_handle,
@@ -609,7 +613,8 @@ int32_t nexus_v2_bootstrap_challenge_release(uint64_t handle);
 /**
  * # Safety
  * `request` and all advertised byte ranges must remain readable and immutable; `out` is
- * aligned writable exclusive u64 storage. Domain 0 production always denies; 1 fixture only.
+ * aligned writable exclusive u64 storage. Domain 0 production always denies; 1 fixture only;
+ * domain 2 isolated staging requires staging-enrollment and a build-pinned issuer.
  */
 int32_t nexus_v2_authority_provision(uint32_t domain,
                                      uint64_t challenge_handle,

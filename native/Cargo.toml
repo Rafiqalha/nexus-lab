@@ -6,6 +6,10 @@ publish = false
 [lib]
 name = "nexus_lab"
 crate-type = ["cdylib", "rlib"]
+[features]
+default = []
+staging = []
 [dependencies]
 jni = "=0.21.1"
 serde_json = "=1.0.145"
+base64 = "=0.22.1"

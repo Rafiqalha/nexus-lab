@@ -9,6 +9,7 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.*
+import org.json.JSONObject
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -29,6 +30,55 @@ class CameraLabTest {
     private fun record(name:String,text:String) {
         InstrumentationRegistry.getInstrumentation().sendStatus(0,Bundle().apply {putString("nexus_camera_$name",text)})
     }
+    private fun result(text: String): JSONObject {
+        val start = text.indexOf('{'); val end = text.lastIndexOf('}')
+        assertTrue("SDK JSON result required", start >= 0 && end > start)
+        return JSONObject(text.substring(start, end + 1))
+    }
+    private fun assertComplete(text: String, secured: Boolean) {
+        val r = result(text)
+        assertEquals(0, r.getInt("sdk_status"))
+        assertEquals(1, r.getInt("decision"))
+        assertTrue(r.getInt("sampling_accepted") >= 5)
+        assertTrue(r.getInt("window_sampling_accepted") >= 5)
+        assertTrue(r.getInt("distinct") >= 3)
+        assertTrue(r.getLong("span_ms") >= 400)
+        assertTrue(r.getBoolean("current_result_valid"))
+        assertEquals(if (secured) 1 else 0, r.getInt("secured"))
+        assertEquals(if (secured) 1 else 0, r.getInt("required_checks_complete"))
+        assertEquals(0, r.getInt("product_eligible"))
+        assertEquals(0, r.getInt("provenance"))
+        assertEquals(0, r.getInt("manipulation"))
+    }
+    @Test fun validIncompleteIsNotComplete() {
+        Native.load(InstrumentationRegistry.getInstrumentation().targetContext)
+        val session = Native.open(); var capture = 0L; var result = 0L
+        try {
+            capture = Native.create(session); result = Native.finish(capture)
+            val r = JSONObject(Native.read(capture, result))
+            assertEquals(0, r.getInt("sdk_status")); assertEquals(2, r.getInt("decision"))
+            assertTrue(r.getBoolean("current_result_valid")); assertEquals(0, r.getInt("secured"))
+            assertEquals(0, r.getInt("required_checks_complete")); assertEquals(0, r.getInt("product_eligible"))
+        } finally { Native.release(session, capture, result) }
+    }
+    @Test fun securedStagingRequiresAuthenticatedEnrollment() {
+        org.junit.Assume.assumeTrue(BuildConfig.NEXUS_STAGING)
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            await(scenario) { it.contains("SDK loaded") }
+            scenario.onActivity { it.labStartSecured() }
+            val final = await(scenario, 30000) { it.contains("\"current_result_valid\": true") }
+            assertComplete(final, true)
+            assertTrue(final.contains("STAGING enrollment="))
+            assertTrue(final.contains("Validated key level="))
+            assertFalse(final.contains("PREVIEW"))
+            record("secured_staging", final)
+            // SDK monotonic expiry, not the app wall clock, decides when a held result is stale.
+            val expired = await(scenario, 40000) { it.contains("\"current_result_valid\": false") }
+            assertFalse(result(expired).getBoolean("current_result_valid"))
+            assertNotEquals(0, result(expired).getInt("validation_status"))
+            record("secured_staging_expiry", expired)
+        }
+    }
     @Test fun realCameraPortraitReversePortraitBackgroundCancelRestartAndFinalValidation() {
         assertEquals(android.content.pm.PackageManager.PERMISSION_GRANTED,
             androidx.core.content.ContextCompat.checkSelfPermission(
@@ -46,12 +96,14 @@ class CameraLabTest {
                 assertTrue("CameraX must deliver expected portrait rotation",oriented)
                 scenario.onActivity { it.labStart() }
                 val measured=await(scenario) {
-                    it.contains("rotation=$rotation") && (it.contains("current_result_valid") || (Regex("delivered=(\\d+)").find(it)?.groupValues?.get(1)?.toInt() ?: 0)>=20)
+                    // Delivered frames do not imply SDK cadence/span completion.
+                    it.contains("rotation=$rotation") && it.contains("\"current_result_valid\": true") &&
+                        result(it).getInt("decision") == 1
                 }
                 assertTrue(measured.contains("rotation=$rotation"))
                 scenario.onActivity { it.labFinish() }
                 val final=await(scenario) { it.contains("\"current_result_valid\": true") }
-                assertTrue(final.contains("\"secured\": 0"));assertTrue(final.contains("\"product_eligible\": 0"))
+                assertComplete(final, false)
                 record("rotation_$rotation",final)
                 scenario.moveToState(Lifecycle.State.CREATED)
                 scenario.moveToState(Lifecycle.State.RESUMED)

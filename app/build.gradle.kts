@@ -1,5 +1,7 @@
 plugins { id("com.android.application"); id("org.jetbrains.kotlin.android") }
 android {
+    buildFeatures { buildConfig = true }
+    val staging = providers.gradleProperty("nexusStaging").orNull == "true"
     namespace = "org.nexus.lab"
     compileSdk = 35
     testBuildType = "release"
@@ -7,11 +9,13 @@ android {
         applicationId = "org.nexus.lab"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
+        buildConfigField("boolean", "NEXUS_STAGING", staging.toString())
+        versionCode = 2
         versionName = "0.1-preview-lab"
         ndk { abiFilters += "arm64-v8a" }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+    sourceSets { getByName("main") { if (staging) manifest.srcFile("src/staging/AndroidManifest.xml") } }
     buildTypes { release { isMinifyEnabled = false; signingConfig = signingConfigs.getByName("debug") } }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }

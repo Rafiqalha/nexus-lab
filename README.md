@@ -1,9 +1,10 @@
 # Nexus External Android Integration Lab
 
-A separate CameraX application and thin Rust JNI consumer of **packaged C ABI 2.9**.
+A separate CameraX application and thin Rust JNI consumer of **packaged C ABI 2.10**.
 It has no `nexus-core` dependency and is outside the SDK Cargo workspace. The default
-preview package is accepted; fixture/diagnostic profiles are rejected at load/open.
-There is no production authority or external evidence provider here.
+preview package is accepted; fixture/diagnostic profiles are rejected at load/open. An explicitly
+imported staging package enables Android Keystore enrollment through a separate loopback Rust
+service. There is no production authority.
 
 One screen: back-camera preview, Start, Cancel, Finish, Check and SDK progress/results.
 Complete means the SDK's configured quality/capture contract, never identity validity,
@@ -53,6 +54,46 @@ On MIUI, if instrumentation cannot open the Activity because background launch i
 run `NEXUS_SHELL_LAUNCH=1 ./tools/device_tests.sh`. This uses the same public launcher
 intent through ADB when the camera test starts; it changes no device permission or keyguard setting.
 Use a textured, non-sensitive scene for capture; no face is required or recorded.
+
+
+## Authenticated staging enrollment
+
+Build the separate sibling `nexus-enrollment` service and initialize its private keys/snapshots outside
+all repositories. Pin its public issuer root into an isolated SDK package:
+
+```sh
+export NEXUS_STAGING_ROOT_PUBLIC_HEX=EXACT_SERVICE_PUBLIC_ROOT
+# In nexus-sdk, with Android NDK linker configured:
+cargo xtask package --target aarch64-linux-android --output dist/NEW_STAGING_PACKAGE --profile staging
+# In this lab:
+python3 tools/import_sdk.py ../nexus-sdk/dist/NEW_STAGING_PACKAGE EXACT_SDK_COMMIT --staging
+./tools/build_android.sh
+adb reverse tcp:8787 tcp:8787
+```
+
+The service policy must allow this APK's exact application ID and signing certificate digest.
+`Enroll new key + secured STAGING capture` creates a fresh key under the lab's own Keystore alias
+with the service challenge, submits its certificate chain and proof of possession, and configures a
+secured SDK session only after both service verification and core signature/binding verification.
+The bridge displays enrollment metadata from the exact provisioning bytes accepted by core.
+Enrollment failure stops secured capture. Preview remains a separate explicit action.
+
+This profile alone requests INTERNET and permits cleartext **localhost only** for ADB reverse;
+the default manifest remains camera-only. No issuer seed, private key export, device-wide identifier,
+frame recording or public service deployment is part of the app. Lab release is locally debug-key
+signed for staging installation. New-key enrollment is explicit; revocation of one key does not
+claim to ban an entire physical device.
+
+The UI separates staging enrollment, verified TEE/StrongBox key level, provisioning/continuity,
+capture decision, required checks, current-result validity and product eligibility. It keeps checking
+a finalized result while held, so the 30-second issuer lease becoming stale is visible. Signed
+app/key context does not prove camera origin or liveness; product eligibility stays zero. Offline
+revocation is bounded by the lease, not instantaneous. There is no durable issuer/witness continuity.
+
+New validation is in [ENROLLMENT_VALIDATION.md](docs/ENROLLMENT_VALIDATION.md). The original
+[VALIDATION.md](docs/VALIDATION.md) remains historical baseline evidence. Completion tests now assert
+SDK success, Complete, minimum/distinct sampling, observation span, current validity and security
+mode; a zero-frame valid Incomplete has its own test.
 
 ## Frame, clock and lifecycle contract
 

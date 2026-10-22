@@ -22,6 +22,7 @@ class LabController(private val worker: ExecutorService, private val publish: (S
     private var session = 0L
     private var capture = 0L
     private var result = 0L
+    private var enrollmentStatus = "PREVIEW: no enrollment or platform evidence"
     private var running = false
     private var token = 0L
     private var key: List<Int>? = null
@@ -41,7 +42,7 @@ class LabController(private val worker: ExecutorService, private val publish: (S
     private var sdk = Timings()
     private var analyzer = Timings()
     private fun emit(t: Long, message: String) { main.post { if (epoch.get() == t) publish(message) } }
-    fun start() {
+    fun start(secured: Boolean = false) {
         val t = epoch.incrementAndGet()
         val previous = cancellable.getAndSet(0)
         if (previous != 0L) Native.cancel(previous)
@@ -50,13 +51,15 @@ class LabController(private val worker: ExecutorService, private val publish: (S
             if (epoch.get() != t) return@execute
             token = t
             try {
-                session = Native.open()
+                if (secured) {
+                    val opened = Enrollment.open(); session = opened.first; enrollmentStatus = opened.second
+                } else { session = Native.open(); enrollmentStatus = "PREVIEW: no enrollment or platform evidence" }
                 capture = Native.create(session)
                 cancellable.set(capture)
                 if (epoch.get() != t) { Native.cancel(capture); cleanup(); return@execute }
                 key = null; lastTimestamp = 0; delivered = 0; submitted = 0; skipped = 0; errors = 0
                 adapter = Timings(); sdk = Timings(); analyzer = Timings(); lastFrame = "No submitted camera frame"; running = true
-                emit(t, "Capturing PREVIEW\n${Native.capabilities(session)}")
+                emit(t, "Capturing\n$enrollmentStatus\n${Native.capabilities(session)}")
             } catch (e: Exception) { cleanup(); emit(t, "Start failed: ${e.message}") }
         }
     }
@@ -78,8 +81,8 @@ class LabController(private val worker: ExecutorService, private val publish: (S
         session = 0; capture = 0; result = 0
         pixels?.let { FrameAdapter.wipe(it) }; key = null
     }
-    private fun report(snapshot: JSONObject): String = "PREVIEW · quality capture only\n" +
-        "Trust/platform evidence unavailable; no liveness or identity verdict.\n" + snapshot.toString(2) +
+    private fun report(snapshot: JSONObject): String = "$enrollmentStatus\n" +
+        "Enrollment metadata is historical; current_result_valid controls current result use.\n" + snapshot.toString(2) +
         "\nAdapter pack: ${adapter.summary()}\nSDK/JNI submit: ${sdk.summary()}\nAnalyzer incl wipe/close: ${analyzer.summary()}\n" +
         "$lastFrame\ndelivered=$delivered submitted=$submitted appSkipped=$skipped errors=$errors\nCameraX dropped frames: UNKNOWN (not exposed by KEEP_ONLY_LATEST)"
     private fun acceptSnapshot(snapshot: JSONObject) {
@@ -101,7 +104,10 @@ class LabController(private val worker: ExecutorService, private val publish: (S
         if (!pollQueued.compareAndSet(false, true)) return
         worker.execute {
             try {
-                if (epoch.get() == token && running && capture != 0L) acceptSnapshot(JSONObject(Native.progress(capture)))
+                if (epoch.get() == token && capture != 0L) {
+                    if (result != 0L) emit(token, report(JSONObject(Native.read(capture, result))))
+                    else if (running) acceptSnapshot(JSONObject(Native.progress(capture)))
+                }
             } catch (e: Exception) { running = false; emit(token, "Progress failed: ${e.message}") }
             finally { pollQueued.set(false) }
         }

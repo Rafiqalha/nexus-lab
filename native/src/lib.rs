@@ -1,6 +1,8 @@
 //! External JNI consumer of the packaged C ABI. No nexus-core dependency.
 //! No pointer survives a JNI call. Only SDK typed numeric handles cross Java.
 #![deny(unsafe_op_in_unsafe_fn)]
+#[cfg(feature = "staging")]
+mod enrollment;
 #[allow(non_snake_case, non_camel_case_types, dead_code)]
 mod sdk;
 use jni::{
@@ -87,8 +89,10 @@ pub extern "system" fn Java_org_nexus_lab_Native_open(mut env: JNIEnv, _: JClass
     guard(&mut env, 0, |_| {
         // SAFETY: scalar ABI queries and live output handle; initialization uses returned typed handle.
         unsafe {
-            if nexus_v2_abi_version() != (2 << 16 | 9) || nexus_v2_build_profile() != 0 {
-                return Err("Only ABI 2.9 default preview package is accepted; fixture/production are not enabled".into());
+            if nexus_v2_abi_version() != (2 << 16 | 10)
+                || nexus_v2_build_profile() != if cfg!(feature = "staging") { 3 } else { 0 }
+            {
+                return Err("Expected matching ABI 2.10 default/staging build; fixture and production are disabled".into());
             }
             let mut h = 0;
             check(nexus_v2_session_create(1000, &mut h))?;
@@ -334,8 +338,11 @@ mod tests {
         assert_eq!(offset_of!(NexusV2CaptureProgress, context_digest), 128);
         // SAFETY: only scalar handles and live aligned exclusive POD/handle outputs.
         unsafe {
-            assert_eq!(nexus_v2_abi_version(), 2 << 16 | 9);
-            assert_eq!(nexus_v2_build_profile(), 0);
+            assert_eq!(nexus_v2_abi_version(), 2 << 16 | 10);
+            assert_eq!(
+                nexus_v2_build_profile(),
+                if cfg!(feature = "staging") { 3 } else { 0 }
+            );
             for _ in 0..80 {
                 let mut session = 0;
                 assert_eq!(nexus_v2_session_create(1000, &mut session), 0);
