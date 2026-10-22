@@ -187,7 +187,12 @@
     }
   ],
   "production_approved": false,
-  "lab_ci": "NOT_RUN: no workflow configured; check remote after push",
+  "lab_ci": {
+    "sha": "1f9cbd222c5c0306a5d04c68df13182b1ed1396c",
+    "status": "NOT_RUN",
+    "runs": 0,
+    "reason": "No GitHub Actions workflow configured in lab; actual SHA queried after push"
+  },
   "limitations": [
     "Short-lived issuer-authenticated staging app/key context, not sensor/camera provenance",
     "No liveness, transaction authorization, production enrollment or distribution approval",
@@ -195,5 +200,6 @@
     "Remote revocation cannot invalidate an offline SDK immediately; lease expiry/update required",
     "Release APK uses local debug signing certificate; no signing material committed",
     "No camera image saved; measurements/counters/digests only"
-  ]
+  ],
+  "lab_implementation_sha": "1f9cbd222c5c0306a5d04c68df13182b1ed1396c"
 }

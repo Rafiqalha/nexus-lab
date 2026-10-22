@@ -9,3 +9,8 @@ The authenticated enrollment milestone consumes SDK main
 `SDK_IDENTITY.json` binds the exact packaged ARM64 source digest and library/header/manifest hashes.
 New device and local checks are recorded separately in ENROLLMENT_VALIDATION.md/json.
 The enrollment service is a separate sibling repository; it has no remote until the owner assigns one.
+
+Enrollment implementation commit `1f9cbd222c5c0306a5d04c68df13182b1ed1396c` was pushed
+to origin/main without force. GitHub Actions queried for that exact SHA returned zero runs;
+this lab has no workflow configured. Local seven-test physical-device PASS is not hosted CI.
+SDK run 39580027152 on ad41f5f completed all six jobs successfully.
