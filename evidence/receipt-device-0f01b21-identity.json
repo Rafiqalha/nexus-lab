@@ -1,0 +1,28 @@
+{
+  "acceptance": {
+    "acceptance_id": "91467778bd5ef3ee1e9a951d83c7a8966465cdbc2030d7fba0b2a25319b38163",
+    "accepted_at_ms": 1792811501590,
+    "authenticated_receipt_accepted": true,
+    "camera_provenance": "not_verified",
+    "capture_claims": "client_reported",
+    "challenge_id": "66c130f8362c4eb253c710ebca7d7ef9167d25d2c5498eb1132c3f82eeaa3837",
+    "enrollment_id": "fbd6158f392c7732a3fa74a72b53b32752e8fe852883829cf2285ef381601ce3",
+    "independent_validation": [
+      "registered_key_signature",
+      "challenge_binding",
+      "online_revocation",
+      "reported_contract_shape"
+    ],
+    "kind": "nexus.capture-acceptance.staging.v1",
+    "manipulation": "not_evaluated",
+    "payload_digest": "1a623fde0b46dc24af906921e5a249423a23bcf9f58f19b9a9c96de214b9e61a",
+    "product_eligible": false,
+    "request_id": "421acc3e92ef85c4489bd7e737b09d91378e1056095e776032f749ee099aaefe",
+    "schema": 1
+  },
+  "registered_key_sha256": "1c944685ea93b7a4ba28c0e9fd672c72543434d1e237f4f0ac01c7683e36caba",
+  "validated_key_level": "trusted_environment",
+  "challenge_key_matches_enrollment": true,
+  "durable_rows_for_challenge": 1,
+  "enrollment_revision": 1
+}

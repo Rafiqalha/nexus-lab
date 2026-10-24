@@ -30,3 +30,9 @@ tools/host_jni.sh now resolves package and target paths to absolute paths. Local
 reproduction with CARGO_TARGET_DIR unset passes the same full host script, including
 actual JNI/JVM and 80 cancel/release cycles (evidence/receipt-host-jni-ci-env.log).
 The next workflow run must be assessed on its own SHA; no hosted PASS is inherited.
+
+## Final-service device follow-up
+
+Run 40056975193 on path-fix 0b1a3c2 completed SUCCESS. Physical 7/7 follow-up now covers
+the final 0f01b21 service binary; exact artifacts, source identity, launcher requirement and
+new durable acceptance are in RECEIPT_FOLLOWUP_20261024.md/json. Earlier reports remain historical.
