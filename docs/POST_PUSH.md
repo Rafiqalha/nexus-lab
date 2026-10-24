@@ -21,3 +21,12 @@ SDK 1c9458391fe9b9e6fb265f2cb9bc99fe9345d950 (ABI 2.11, 60 exports) has six succ
 New physical and local receipt evidence is separate in RECEIPT_VALIDATION.md/json. The lab now includes
 a hardware-free workflow and a dedicated read-only SDK checkout secret. Hosted status for the next
 lab commit is checked after push; the earlier no-workflow statement above remains historical.
+
+## CI path correction
+
+Lab run 40053508609 on d90d168 failed at JVM System.load because the default Cargo
+target path was relative; Rust checks had passed and Android step was skipped.
+tools/host_jni.sh now resolves package and target paths to absolute paths. Local
+reproduction with CARGO_TARGET_DIR unset passes the same full host script, including
+actual JNI/JVM and 80 cancel/release cycles (evidence/receipt-host-jni-ci-env.log).
+The next workflow run must be assessed on its own SHA; no hosted PASS is inherited.
