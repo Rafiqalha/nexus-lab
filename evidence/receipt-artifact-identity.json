@@ -1,0 +1,39 @@
+{
+  "apk_sha256": "8543b090d7df006649d945d1f170ef54d016ca8ba1ca328491bd3ee7b4675a29",
+  "identity": {
+    "source_sha": "1c9458391fe9b9e6fb265f2cb9bc99fe9345d950",
+    "source_digest": "e440588a1072d3d516e53190cfbe4553e9bf9bc22f6138563a7f34e1c7e320c3",
+    "target": "aarch64-linux-android",
+    "staging_root_public_key": "36f931c634f728780664d725c0c819665f23249380c9069ae360b02bf9a5f883",
+    "profile": "staging-enrollment",
+    "abi": "2.11",
+    "package_directory": "vendor/android-arm64-staging-1da525a70dcc",
+    "exports": 60,
+    "sdk_sha256": "1da525a70dcc1ebd52bc8105f35b8b238676b10fc8608a751521b5da3c5d8fcf",
+    "header_sha256": "6e287b6d0f0cd33fa1ebc195c22ab990460d3265ce362b662625bdb8f185512f",
+    "package_manifest_sha256": "f8be41fb7052e4c66d0e33e8e975288eb075620e35e982de0921d719f1cbba9e",
+    "bridge_sha256": "f704068ae3e773010e2405103a6440514ad1a18b126f1918264a1c0645580e68"
+  },
+  "native_apk_and_installed_match": true,
+  "native_sha256": {
+    "libnexus_sdk.so": "1da525a70dcc1ebd52bc8105f35b8b238676b10fc8608a751521b5da3c5d8fcf",
+    "libnexus_lab.so": "f704068ae3e773010e2405103a6440514ad1a18b126f1918264a1c0645580e68"
+  },
+  "durable_acceptance": {
+    "acceptance_id": "8c8f864fa02ae46c06418a1adac4af4cd50f79d2894994fd8d2c445cceec925c",
+    "payload_digest": "52bd9c11f56d9e0695dac34d60d3ac88c8234924b23c933c195d98572d9bed8c",
+    "enrollment_id": "24ea4507395a1ca0d185828ff5f1907ae7e6956d0c77d74a3b37949657989e1a",
+    "key_sha256": "c9b948a579aafd725d936b4ccc2a6021b28db2d3b630f71c9855d01dae77f748",
+    "validated_key_level": "trusted_environment",
+    "authenticated_receipt_accepted": true,
+    "capture_claims": "client_reported",
+    "independent_validation": [
+      "registered_key_signature",
+      "challenge_binding",
+      "online_revocation",
+      "reported_contract_shape"
+    ],
+    "product_eligible": false,
+    "durable_rows_for_challenge": 1
+  }
+}

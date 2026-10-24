@@ -1,0 +1,41 @@
+name: Verify lab without hardware
+on:
+  push:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: nexus-lab
+          persist-credentials: false
+      - name: Checkout pinned private SDK with dedicated read-only key
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: Rafiqalha/nexus-sdk
+          ref: 1c9458391fe9b9e6fb265f2cb9bc99fe9345d950
+          ssh-key: ${{ secrets.NEXUS_SDK_READ_KEY }}
+          path: nexus-sdk
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Rust and Android toolchains
+        run: |
+          rustup toolchain install 1.99.0 --profile minimal --component rustfmt --component clippy
+          rustup target add aarch64-linux-android --toolchain 1.99.0
+          echo "JAVA_HOME=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME_17_X64/bin" >> "$GITHUB_PATH"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-35' 'build-tools;35.0.0' 'ndk;27.2.12479018'
+      - name: Packaged default SDK and actual JNI/JVM tests
+        working-directory: nexus-lab
+        run: |
+          (cd ../nexus-sdk && cargo run -p xtask --locked -- package --target x86_64-unknown-linux-gnu --output dist/ci-lab-host)
+          NEXUS_SDK_PACKAGE="$GITHUB_WORKSPACE/nexus-sdk/dist/ci-lab-host" tools/host_jni.sh
+      - name: ARM64 release build, JVM tests and lint; no physical-device claim
+        working-directory: nexus-lab
+        run: |
+          tools/prepare_sdk.sh ../nexus-sdk dist/ci-lab-android
+          tools/build_android.sh
+          ./gradlew --no-daemon :app:lintRelease

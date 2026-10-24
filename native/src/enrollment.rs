@@ -41,7 +41,7 @@ impl Document {
 pub extern "system" fn Java_org_nexus_lab_Native_stageBegin(mut env: JNIEnv, _: JClass) -> jstring {
     guard(&mut env, std::ptr::null_mut(), |env| {
         if unsafe { nexus_v2_build_profile() } != 3
-            || unsafe { nexus_v2_abi_version() } != (2 << 16 | 10)
+            || unsafe { nexus_v2_abi_version() } != (2 << 16 | 11)
         {
             return Err("Isolated staging build required".into());
         }
@@ -205,5 +205,85 @@ pub extern "system" fn Java_org_nexus_lab_Native_stageAbort(
             }
         }
         Ok(0)
+    })
+}
+
+#[no_mangle]
+pub extern "system" fn Java_org_nexus_lab_Native_createBound(
+    mut env: JNIEnv,
+    _: JClass,
+    session: jlong,
+    document: JString,
+) -> jlong {
+    guard(&mut env, 0, |env| {
+        let raw = env.get_string(&document).map_err(|e| e.to_string())?;
+        let raw = raw.to_str().map_err(|e| e.to_string())?;
+        if raw.len() > 32 * 1024 {
+            return Err("Challenge exceeds bound".into());
+        }
+        let v: Value = serde_json::from_str(raw).map_err(|e| e.to_string())?;
+        let doc = Document::parse(&v)?;
+        let cfg = capture_config();
+        let mut out = 0;
+        // SAFETY: owned immutable inputs and aligned exclusive output; core verifies document and scope.
+        check(unsafe {
+            nexus_v2_capture_create_bound_v1(handle(session)?, &cfg, &doc.view(), &mut out)
+        })?;
+        Ok(out as jlong)
+    })
+}
+#[no_mangle]
+pub extern "system" fn Java_org_nexus_lab_Native_receiptExport(
+    mut env: JNIEnv,
+    _: JClass,
+    capture: jlong,
+    result: jlong,
+) -> jni::sys::jbyteArray {
+    guard(&mut env, std::ptr::null_mut(), |env| {
+        let mut bytes = [0u8; 8192];
+        let mut len = 0;
+        // SAFETY: owned exact writable output and disjoint aligned length.
+        check(unsafe {
+            nexus_v2_capture_receipt_export_v1(
+                handle(capture)?,
+                handle(result)?,
+                bytes.as_mut_ptr(),
+                8192,
+                &mut len,
+            )
+        })?;
+        Ok(env
+            .byte_array_from_slice(&bytes[..len as usize])
+            .map_err(|e| e.to_string())?
+            .into_raw())
+    })
+}
+#[no_mangle]
+pub extern "system" fn Java_org_nexus_lab_Native_receiptWire(
+    mut env: JNIEnv,
+    _: JClass,
+    input: jni::objects::JByteArray,
+    der: jni::objects::JByteArray,
+) -> jstring {
+    guard(&mut env, std::ptr::null_mut(), |env| {
+        if env.get_array_length(&input).map_err(|e| e.to_string())? > 8192
+            || env.get_array_length(&der).map_err(|e| e.to_string())? > 72
+        {
+            return Err("Receipt signature bound".into());
+        }
+        let input = env.convert_byte_array(input).map_err(|e| e.to_string())?;
+        let der = env.convert_byte_array(der).map_err(|e| e.to_string())?;
+        let signature = p256::ecdsa::Signature::from_der(&der).map_err(|_| "Invalid ES256 DER")?;
+        if signature.to_der().as_bytes() != der {
+            return Err("Noncanonical ES256 DER".into());
+        }
+        let input = std::str::from_utf8(&input).map_err(|e| e.to_string())?;
+        let wire = format!(
+            "{input}.{}",
+            base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(signature.to_bytes())
+        );
+        env.new_string(wire)
+            .map(|s| s.into_raw())
+            .map_err(|e| e.to_string())
     })
 }

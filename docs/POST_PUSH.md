@@ -14,3 +14,10 @@ Enrollment implementation commit `1f9cbd222c5c0306a5d04c68df13182b1ed1396c` was 
 to origin/main without force. GitHub Actions queried for that exact SHA returned zero runs;
 this lab has no workflow configured. Local seven-test physical-device PASS is not hosted CI.
 SDK run 39580027152 on ad41f5f completed all six jobs successfully.
+
+## Receipt milestone
+
+SDK 1c9458391fe9b9e6fb265f2cb9bc99fe9345d950 (ABI 2.11, 60 exports) has six successful jobs in run 40051466147.
+New physical and local receipt evidence is separate in RECEIPT_VALIDATION.md/json. The lab now includes
+a hardware-free workflow and a dedicated read-only SDK checkout secret. Hosted status for the next
+lab commit is checked after push; the earlier no-workflow statement above remains historical.

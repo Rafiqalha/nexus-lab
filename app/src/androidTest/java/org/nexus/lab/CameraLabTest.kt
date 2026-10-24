@@ -16,13 +16,13 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class CameraLabTest {
     private fun status(s: ActivityScenario<MainActivity>): String { var text="";s.onActivity { text=it.labStatus() };return text }
-    private fun await(s: ActivityScenario<MainActivity>, maxMs:Long=18000, predicate:(String)->Boolean):String {
+    private fun await(s: ActivityScenario<MainActivity>, maxMs:Long=18000, expectedKeyLoss:Boolean=false, predicate:(String)->Boolean):String {
         val until=SystemClock.elapsedRealtime()+maxMs
         var last=""
         while(SystemClock.elapsedRealtime()<until) {
             last=status(s)
             if(predicate(last)) return last
-            if(last.contains("failed",true)||last.contains("refused",true)) fail(last)
+            if ((last.contains("failed",true)||last.contains("refused",true)) && !(expectedKeyLoss && last.contains("Enrollment key missing"))) fail(last)
             Thread.sleep(20)
         }
         fail("Timed out; $last");return last
@@ -71,11 +71,20 @@ class CameraLabTest {
             assertTrue(final.contains("STAGING enrollment="))
             assertTrue(final.contains("Validated key level="))
             assertFalse(final.contains("PREVIEW"))
+            assertTrue(final.contains("authenticated_receipt_accepted"))
+            assertTrue(final.contains("client_reported"))
             record("secured_staging", final)
+            scenario.onActivity { it.labSubmitReceipt() }
+            await(scenario) { it.contains("attempt=2:") && it.contains("authenticated_receipt_accepted=true") }
+            scenario.onActivity { it.labLoseEnrollmentKey(); it.labSubmitReceipt() }
+            await(scenario) { it.contains("Enrollment key missing") }
+            record("receipt_missing_key", "PASS: submission stopped; no replacement key or trusted fallback")
             // SDK monotonic expiry, not the app wall clock, decides when a held result is stale.
-            val expired = await(scenario, 40000) { it.contains("\"current_result_valid\": false") }
+            val expired = await(scenario, 40000, expectedKeyLoss=true) { it.contains("\"current_result_valid\": false") }
             assertFalse(result(expired).getBoolean("current_result_valid"))
             assertNotEquals(0, result(expired).getInt("validation_status"))
+            scenario.onActivity { it.labSubmitReceipt() }
+            await(scenario) { it.contains("Receipt submission failed") }
             record("secured_staging_expiry", expired)
         }
     }

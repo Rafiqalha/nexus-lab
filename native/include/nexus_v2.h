@@ -9,9 +9,11 @@
 
 #define NEXUS_V2_ABI_MAJOR 2
 
-#define NEXUS_V2_ABI_MINOR 10
+#define NEXUS_V2_ABI_MINOR 11
 
 #define NEXUS_V2_STRUCT_VERSION 1
+
+#define NEXUS_V2_CAPTURE_RECEIPT_CAPACITY 8192
 
 typedef struct NexusV2Frame {
   uint32_t struct_size;
@@ -753,6 +755,28 @@ int32_t nexus_v2_capture_progress_v2(uint64_t h,
 int32_t nexus_v2_capture_result_read_v2(uint64_t h,
                                         struct NexusV2CaptureProgressV2 *out,
                                         uint32_t size);
+
+/**
+ * Immutable authenticated staging challenge, bound before any frame. Existing config layout is unchanged.
+ * # Safety
+ * Inputs are live readable immutable and disjoint from aligned exclusive output storage.
+ */
+int32_t nexus_v2_capture_create_bound_v1(uint64_t session,
+                                         const struct NexusV2CaptureConfigV2 *config,
+                                         const struct NexusV2SignedDocument *challenge,
+                                         uint64_t *out);
+
+/**
+ * Complete-only JWS ES256 signing input. Caller owns the fixed buffer, no Rust allocation crosses ABI.
+ * # Safety
+ * `out` is exclusive writable 8192-byte storage; `out_len` is aligned writable u32, disjoint from it.
+ * Invalid pointer/alignment/capacity has no clearing promise. Valid outputs are zeroed before lookup.
+ */
+int32_t nexus_v2_capture_receipt_export_v1(uint64_t capture_handle,
+                                           uint64_t result_handle,
+                                           uint8_t *out,
+                                           uint32_t capacity,
+                                           uint32_t *out_len);
 
 /**
  * Create an immutable processing configuration; initialize/configure using existing lifecycle APIs.

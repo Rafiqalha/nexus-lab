@@ -89,7 +89,7 @@ pub extern "system" fn Java_org_nexus_lab_Native_open(mut env: JNIEnv, _: JClass
     guard(&mut env, 0, |_| {
         // SAFETY: scalar ABI queries and live output handle; initialization uses returned typed handle.
         unsafe {
-            if nexus_v2_abi_version() != (2 << 16 | 10)
+            if nexus_v2_abi_version() != (2 << 16 | 11)
                 || nexus_v2_build_profile() != if cfg!(feature = "staging") { 3 } else { 0 }
             {
                 return Err("Expected matching ABI 2.10 default/staging build; fixture and production are disabled".into());
@@ -112,19 +112,7 @@ pub extern "system" fn Java_org_nexus_lab_Native_create(
 ) -> jlong {
     guard(&mut env, 0, |_| {
         let session = handle(session)?;
-        // SAFETY: all-zero reserved numeric POD fields are valid; no ownership in config.
-        let mut cfg: NexusV2CaptureConfigV2 = unsafe { std::mem::zeroed() };
-        cfg.struct_size = size_of::<NexusV2CaptureConfigV2>() as u32;
-        cfg.version = 2;
-        cfg.min_accepted = 5;
-        cfg.max_submissions = 256;
-        cfg.quality_window = 32;
-        cfg.max_duration_ms = 15000;
-        cfg.context_mode = 1;
-        cfg.min_distinct = 3;
-        cfg.min_interval_ms = 100;
-        cfg.min_observation_span_ms = 400;
-        cfg.max_sample_gap_ms = 1500;
+        let cfg = capture_config();
         let mut h = 0;
         // SAFETY: exact live input config and exclusive disjoint output handle.
         check(unsafe { nexus_v2_capture_create_v2(session, &cfg, &mut h) })?;
@@ -322,6 +310,23 @@ pub extern "system" fn Java_org_nexus_lab_Native_capabilities(
     })
 }
 
+fn capture_config() -> NexusV2CaptureConfigV2 {
+    // SAFETY: all-zero reserved numeric POD fields are valid; no ownership in config.
+    let mut cfg: NexusV2CaptureConfigV2 = unsafe { std::mem::zeroed() };
+    cfg.struct_size = size_of::<NexusV2CaptureConfigV2>() as u32;
+    cfg.version = 2;
+    cfg.min_accepted = 5;
+    cfg.max_submissions = 256;
+    cfg.quality_window = 32;
+    cfg.max_duration_ms = 15000;
+    cfg.context_mode = 1;
+    cfg.min_distinct = 3;
+    cfg.min_interval_ms = 100;
+    cfg.min_observation_span_ms = 400;
+    cfg.max_sample_gap_ms = 1500;
+    cfg
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -338,7 +343,7 @@ mod tests {
         assert_eq!(offset_of!(NexusV2CaptureProgress, context_digest), 128);
         // SAFETY: only scalar handles and live aligned exclusive POD/handle outputs.
         unsafe {
-            assert_eq!(nexus_v2_abi_version(), 2 << 16 | 10);
+            assert_eq!(nexus_v2_abi_version(), 2 << 16 | 11);
             assert_eq!(
                 nexus_v2_build_profile(),
                 if cfg!(feature = "staging") { 3 } else { 0 }

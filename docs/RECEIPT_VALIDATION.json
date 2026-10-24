@@ -1,0 +1,164 @@
+{
+  "milestone": "Device-bound capture receipt staging",
+  "baseline": "700128e7728b937f05c06023a2f955e59d3e6772",
+  "sdk_sha": "1c9458391fe9b9e6fb265f2cb9bc99fe9345d950",
+  "sdk_hosted_ci": {
+    "url": "https://github.com/Rafiqalha/nexus-sdk/actions/runs/40051466147",
+    "conclusion": "SUCCESS",
+    "jobs": 6
+  },
+  "service_sha": "0f01b218e593df243cb3b00aa66fdc4ad9d4bc7f",
+  "service_remote": "NOT_CONFIGURED; committed locally",
+  "physical_service_scope": "Policy-final service before final revision guard; latest guard locally tested separately, no physical rerun after USB disconnect.",
+  "source_files": {
+    "Cargo.lock": "885dd0538de229b85716a05d866317ae02fd598a27f440ec650397c4e85b4949",
+    "Cargo.toml": "f51d67c2631f2cc80bc72a0b1efc55ce201c2063521ab7e51dde2fda3ab42a3e",
+    "SDK_IDENTITY.json": "6f276640f1ef1246a54060874744671714f72174948ed3988abb06e7623ba533",
+    "app/src/androidTest/java/org/nexus/lab/BridgeTest.kt": "b42480e0a2daede584e05807e12c8bb608d05c8cce9cd16ab5d0a722049bd24d",
+    "app/src/androidTest/java/org/nexus/lab/CameraLabTest.kt": "52de8ba7c034e5e366db52fc516f670973ca61d5ecb9f9c3bc03b7333025a473",
+    "app/src/main/java/org/nexus/lab/Enrollment.kt": "5e3dfb1f71dd4150ace3ca44d5d6dfad8db56dd6712002349b3bcf2d51e9daba",
+    "app/src/main/java/org/nexus/lab/FrameAdapter.kt": "f7122afcd23749428c290b1cec9bcab15ab6043dc5451a8107cb1869df3ec0d2",
+    "app/src/main/java/org/nexus/lab/LabController.kt": "0542a2426a08274ef533224a3b0f8f3c0205bd491aa1968b12b36ebe94ac149f",
+    "app/src/main/java/org/nexus/lab/MainActivity.kt": "18862a00e9bee08eb592babdf322643b0ea9cf247bea53eaa76ad18cd99b2fbf",
+    "app/src/main/java/org/nexus/lab/Native.kt": "aa8a9be584a6695be2ea86c3140a1dbd5a2c3fca39d4fdec6bc56f782f4c7bab",
+    "app/src/main/java/org/nexus/lab/Timings.kt": "c59de5040306e3ab92f4ff0bdbf19593d444e4ef4da0183e210b9c6244bebb9e",
+    "native/src/enrollment.rs": "6b0b22d60411cf47ad8d7eedbf6fec98b5924798ac31e550c5555972c3781ebe",
+    "native/src/lib.rs": "5c4dfbfbcfe3d22d02429981eeced48bf97254c8397e23d27109a77836769c60",
+    "native/src/sdk.rs": "ed8cfb604fb12fe688f9599b85639b81ba9735b273c6dcc057aca348312a7280",
+    "tools/build_android.sh": "875701a29176bb153ce05d4894fc7b4a91b4665b9ccce00a93cc549b41619ae4",
+    "tools/collect_notices.py": "437f2ff4893257996d5a7f4194a822a8599db8b3e4da289c15d7ffe18fb38e3a",
+    "tools/device_tests.sh": "020871aae10a4fb45ec0537f2c255127a38a5cc17d5a8410117ce82df13a55ee",
+    "tools/generate_bindings.py": "e8d9badd0c0c2cc394651c9ec8120aec01d20ec39125b177e4e7189a48663dbd",
+    "tools/host_jni.sh": "df3c63ae92b2f7e1a0681a6be7108a2e34ad886305a27d18df31e825415246dc",
+    "tools/import_sdk.py": "1bf53ddffbc56220b36dc617f3bc7d14bc8edd4cdd49021fd9523a3c339810f1",
+    "tools/jvm/org/nexus/lab/Native.java": "98e8f553c7f8cb5e43904f8072ba9f6e3e94a5d24c684fdc3576006065527476",
+    "tools/prepare_sdk.sh": "290278d50f876c737a1f6cf9e272abadd604daf5a2654ef745b528d3c69ad2be",
+    "tools/run_instrumentation.py": "bef5d37dde303e5307fe0004ce776ae134f12b6c6c1e5b5ed8569758db577f96"
+  },
+  "checks": [
+    {
+      "command": "tools/host_jni.sh (packaged default host SDK)",
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "/home/rafiq/Projects/nexus-android-lab/evidence/receipt-host-jni-corrected.log",
+      "sha256": "00c59485c40b7571ef4424315f0537eade8e386e6e7f69b21a286152df8d0f62"
+    },
+    {
+      "command": "tools/import_sdk.py packaged ARM64 staging SDK",
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "/home/rafiq/Projects/nexus-android-lab/evidence/receipt-import.log",
+      "sha256": "5f14de0d9029c84602d49addee9b08c0375a6c8efa88d8d7cbc3dbeadf23e1b6"
+    },
+    {
+      "command": "tools/build_android.sh (staging)",
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "/home/rafiq/Projects/nexus-android-lab/evidence/receipt-build-final.log",
+      "sha256": "5d25b074e92ba348a49bfc11c64d12dd56a8b38d3ca3ddc34bf9c6a060c8a2c3"
+    },
+    {
+      "command": "./gradlew --no-daemon -PnexusStaging=true :app:lintRelease",
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "/home/rafiq/Projects/nexus-android-lab/evidence/receipt-lint-final.log",
+      "sha256": "5c773e1cdef1573062242e5b8d5b66ecb865f81f51811315eb09272e14307289"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets --locked --features staging -- -D warnings (final packaged staging SDK)",
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "/home/rafiq/Projects/nexus-android-lab/evidence/receipt-packaged-staging-clippy.log",
+      "sha256": "1ee5bbfa0289899a4b7ec129f709a43918e560c1b46db15dbf2466fecf3d773e"
+    },
+    {
+      "command": "cargo test --workspace --locked --features staging (final packaged staging SDK)",
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "/home/rafiq/Projects/nexus-android-lab/evidence/receipt-packaged-staging-test.log",
+      "sha256": "c8af0ec2e1d24a599b70d75a547c998fed512bcba42b188568a0c431217dd167"
+    },
+    {
+      "command": "adb shell am instrument -w -r org.nexus.lab.test/androidx.test.runner.AndroidJUnitRunner",
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "/home/rafiq/Projects/nexus-android-lab/evidence/receipt-device-final.log",
+      "sha256": "233fb0e3fc83cefe5241b0099f8e02e36b176120b02cc1af512c425c899c0d7c"
+    },
+    {
+      "command": "apksigner verify --verbose --print-certs release APK",
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "/home/rafiq/Projects/nexus-android-lab/evidence/receipt-apk-signature.log",
+      "sha256": "5bb7e38f01c922ca2969d43aa87ad3bdeb40ffd6228110cfaf7b545abca7fb35"
+    },
+    {
+      "command": "zipalign -c -P 16 -v 4 release APK",
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "/home/rafiq/Projects/nexus-android-lab/evidence/receipt-apk-alignment.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "device": {
+    "model": "Redmi Note 12 / Xiaomi 23021RAA2Y",
+    "os": "Android 15 / API 35",
+    "abi": "arm64-v8a",
+    "key_level": "trusted_environment",
+    "strongbox_claimed": false,
+    "tests": "7 passed; no emulator substitution"
+  },
+  "artifacts": {
+    "apk_sha256": "8543b090d7df006649d945d1f170ef54d016ca8ba1ca328491bd3ee7b4675a29",
+    "identity": {
+      "source_sha": "1c9458391fe9b9e6fb265f2cb9bc99fe9345d950",
+      "source_digest": "e440588a1072d3d516e53190cfbe4553e9bf9bc22f6138563a7f34e1c7e320c3",
+      "target": "aarch64-linux-android",
+      "staging_root_public_key": "36f931c634f728780664d725c0c819665f23249380c9069ae360b02bf9a5f883",
+      "profile": "staging-enrollment",
+      "abi": "2.11",
+      "package_directory": "vendor/android-arm64-staging-1da525a70dcc",
+      "exports": 60,
+      "sdk_sha256": "1da525a70dcc1ebd52bc8105f35b8b238676b10fc8608a751521b5da3c5d8fcf",
+      "header_sha256": "6e287b6d0f0cd33fa1ebc195c22ab990460d3265ce362b662625bdb8f185512f",
+      "package_manifest_sha256": "f8be41fb7052e4c66d0e33e8e975288eb075620e35e982de0921d719f1cbba9e",
+      "bridge_sha256": "f704068ae3e773010e2405103a6440514ad1a18b126f1918264a1c0645580e68"
+    },
+    "native_apk_and_installed_match": true,
+    "native_sha256": {
+      "libnexus_sdk.so": "1da525a70dcc1ebd52bc8105f35b8b238676b10fc8608a751521b5da3c5d8fcf",
+      "libnexus_lab.so": "f704068ae3e773010e2405103a6440514ad1a18b126f1918264a1c0645580e68"
+    },
+    "durable_acceptance": {
+      "acceptance_id": "8c8f864fa02ae46c06418a1adac4af4cd50f79d2894994fd8d2c445cceec925c",
+      "payload_digest": "52bd9c11f56d9e0695dac34d60d3ac88c8234924b23c933c195d98572d9bed8c",
+      "enrollment_id": "24ea4507395a1ca0d185828ff5f1907ae7e6956d0c77d74a3b37949657989e1a",
+      "key_sha256": "c9b948a579aafd725d936b4ccc2a6021b28db2d3b630f71c9855d01dae77f748",
+      "validated_key_level": "trusted_environment",
+      "authenticated_receipt_accepted": true,
+      "capture_claims": "client_reported",
+      "independent_validation": [
+        "registered_key_signature",
+        "challenge_binding",
+        "online_revocation",
+        "reported_contract_shape"
+      ],
+      "product_eligible": false,
+      "durable_rows_for_challenge": 1
+    }
+  },
+  "hosted_lab_ci": "NOT_RUN at report creation; workflow added, exact pushed SHA checked separately",
+  "production_approved": false,
+  "product_eligible": false,
+  "retained_initial_failures": [
+    "Generated bindings were not rustfmt formatted; generator now formats output, host checks rerun PASS.",
+    "Device helper interpreted expected missing-key failure as test failure during expiry wait; scoped expected-key-loss handling fixed, final 7/7 campaign PASS."
+  ],
+  "limits": [
+    "Receipt signature does not verify camera provenance or truth of metrics.",
+    "Captures remain client_reported; no manipulation/liveness/product authorization.",
+    "No public service deployment or production release.",
+    "No hardware-independent storage/anti-rollback evidence.",
+    "No images or raw frame payloads retained in evidence."
+  ]
+}

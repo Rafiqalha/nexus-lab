@@ -20,6 +20,9 @@ object Native {
     @JvmStatic external fun stageBegin(): String
     @JvmStatic external fun stageComplete(session: Long, challenge: Long, bundle: String): String
     @JvmStatic external fun stageAbort(session: Long, challenge: Long): Int
+    @JvmStatic external fun createBound(session: Long, document: String): Long
+    @JvmStatic external fun receiptExport(capture: Long, result: Long): ByteArray
+    @JvmStatic external fun receiptWire(input: ByteArray, der: ByteArray): String
     private var identity: String? = null
     @Synchronized fun load(context: Context): String {
         identity?.let { return it }

@@ -1,13 +1,13 @@
 {
-  "source_sha": "ad41f5fde927de5eed2c9d7a104bc67fc22b8fb6",
-  "source_digest": "06e935cf29c7f4c4cfd00ff75168cbad7884a98cf25db2eb912148d4ff0d6006",
+  "source_sha": "1c9458391fe9b9e6fb265f2cb9bc99fe9345d950",
+  "source_digest": "e440588a1072d3d516e53190cfbe4553e9bf9bc22f6138563a7f34e1c7e320c3",
   "target": "aarch64-linux-android",
   "staging_root_public_key": "36f931c634f728780664d725c0c819665f23249380c9069ae360b02bf9a5f883",
   "profile": "staging-enrollment",
-  "abi": "2.10",
-  "package_directory": "vendor/android-arm64-staging-d57cae416e4e",
-  "exports": 58,
-  "sdk_sha256": "d57cae416e4e17c8ea79290949015e6c17f4ccb73e85a81b152982091cd9f26a",
-  "header_sha256": "8b45a3b30cc3062a1ef1df16a32327d1e205f0894420942d191925f2cc3086a6",
-  "package_manifest_sha256": "d57be7e00f5e149c95242f1f40630db91bdd4abbef99003cb138091fa06cda00"
+  "abi": "2.11",
+  "package_directory": "vendor/android-arm64-staging-1da525a70dcc",
+  "exports": 60,
+  "sdk_sha256": "1da525a70dcc1ebd52bc8105f35b8b238676b10fc8608a751521b5da3c5d8fcf",
+  "header_sha256": "6e287b6d0f0cd33fa1ebc195c22ab990460d3265ce362b662625bdb8f185512f",
+  "package_manifest_sha256": "f8be41fb7052e4c66d0e33e8e975288eb075620e35e982de0921d719f1cbba9e"
 }

@@ -57,6 +57,9 @@ class MainActivity : ComponentActivity() {
             text = "Enroll new key + secured STAGING capture"
             setOnClickListener { if (loaded && hasCameraPermission()) { if (analysis == null) bindCamera(); controller.start(true) } }
         })
+        if (BuildConfig.NEXUS_STAGING) root.addView(Button(this).apply {
+            text = "Submit receipt / Retry"; setOnClickListener { controller.submitReceipt() }
+        })
         status = TextView(this).apply { text = "Loading verified SDK package…"; textSize = 12f; setTextIsSelectable(true) }
         root.addView(ScrollView(this).apply { addView(status) }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
         setContentView(root)
@@ -66,6 +69,8 @@ class MainActivity : ComponentActivity() {
             catch (e: Throwable) { runOnUiThread { status.text = "Library load failed: ${e.message}" } }
         }
     }
+    internal fun labSubmitReceipt() = controller.submitReceipt()
+    internal fun labLoseEnrollmentKey() = controller.loseEnrollmentKey()
     internal fun labObservedRotation() = controller.observedRotation
     internal fun labStatus() = status.text.toString()
     internal fun labSdkInFlight() = controller.sdkInFlight

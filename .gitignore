@@ -12,3 +12,5 @@ app/src/main/assets/sdk-identity.json
 evidence/*.log
 evidence/*.xml
 tools/__pycache__/
+
+/target/

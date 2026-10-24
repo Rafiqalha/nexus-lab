@@ -1,6 +1,6 @@
 # Nexus External Android Integration Lab
 
-A separate CameraX application and thin Rust JNI consumer of **packaged C ABI 2.10**.
+A separate CameraX application and thin Rust JNI consumer of **packaged C ABI 2.11**.
 It has no `nexus-core` dependency and is outside the SDK Cargo workspace. The default
 preview package is accepted; fixture/diagnostic profiles are rejected at load/open. An explicitly
 imported staging package enables Android Keystore enrollment through a separate loopback Rust
@@ -157,3 +157,24 @@ Official references:
 - https://developer.android.com/reference/androidx/camera/core/ImageProxy.PlaneProxy
 - https://developer.android.com/media/camera/camerax/analyze
 - https://developer.android.com/training/camerax/orientation-rotation
+
+## Device-bound receipt staging (ABI 2.11)
+
+Secured capture now requests a server-signed challenge and passes it to core before any frame.
+A distinct Keystore alias belongs to each enrollment/session; it is not silently replaced for an
+old receipt. Complete finalization exports the exact core-owned JWS signing input, signs it with the
+same enrolled key, converts Android DER to raw ES256 through Rust, revalidates and submits. The
+`Submit receipt / Retry` action retries only that live payload; missing/changed key requires explicit
+new enrollment. No metrics JSON is supplied by Kotlin to the core exporter.
+
+The UI separates server receipt acceptance from client-reported capture claims and current SDK
+result validity. Server online revocation can deny a still-live offline result. A held acceptance or
+exported bytes are historical after expiry/cancellation. Signature does not prove camera origin,
+core execution integrity, liveness or product authorization. Product eligibility remains false.
+
+`.github/workflows/verify.yml` builds/test/lints the lab without a phone against a pinned packaged SDK.
+A dedicated read-only SDK deploy key is stored in `NEXUS_SDK_READ_KEY`, distinct from issuer keys.
+CI builds default preview; isolated staging root campaigns belong to SDK/service workflows. Physical
+TEE capture-to-server evidence remains a separate campaign and is never inferred from CI builds.
+
+Current receipt evidence: [RECEIPT_VALIDATION.md](docs/RECEIPT_VALIDATION.md).

@@ -23,6 +23,9 @@ class LabController(private val worker: ExecutorService, private val publish: (S
     private var capture = 0L
     private var result = 0L
     private var enrollmentStatus = "PREVIEW: no enrollment or platform evidence"
+    private var enrolled: Enrollment.DeviceSession? = null
+    private var submissionAttempt = 0
+    private var submissionStatus = "Server acceptance: not submitted"
     private var running = false
     private var token = 0L
     private var key: List<Int>? = null
@@ -52,9 +55,11 @@ class LabController(private val worker: ExecutorService, private val publish: (S
             token = t
             try {
                 if (secured) {
-                    val opened = Enrollment.open(); session = opened.first; enrollmentStatus = opened.second
+                    val opened = Enrollment.open(); enrolled = opened; session = opened.handle; enrollmentStatus = opened.status
                 } else { session = Native.open(); enrollmentStatus = "PREVIEW: no enrollment or platform evidence" }
-                capture = Native.create(session)
+                submissionAttempt = 0
+                submissionStatus = "Server acceptance: not submitted"
+                capture = enrolled?.createCapture() ?: Native.create(session)
                 cancellable.set(capture)
                 if (epoch.get() != t) { Native.cancel(capture); cleanup(); return@execute }
                 key = null; lastTimestamp = 0; delivered = 0; submitted = 0; skipped = 0; errors = 0
@@ -78,10 +83,11 @@ class LabController(private val worker: ExecutorService, private val publish: (S
         running = false
         cancellable.compareAndSet(capture, 0)
         if (session != 0L || capture != 0L || result != 0L) Native.release(session, capture, result)
+        enrolled?.close(); enrolled = null
         session = 0; capture = 0; result = 0
         pixels?.let { FrameAdapter.wipe(it) }; key = null
     }
-    private fun report(snapshot: JSONObject): String = "$enrollmentStatus\n" +
+    private fun report(snapshot: JSONObject): String = "$enrollmentStatus\n$submissionStatus\n" +
         "Enrollment metadata is historical; current_result_valid controls current result use.\n" + snapshot.toString(2) +
         "\nAdapter pack: ${adapter.summary()}\nSDK/JNI submit: ${sdk.summary()}\nAnalyzer incl wipe/close: ${analyzer.summary()}\n" +
         "$lastFrame\ndelivered=$delivered submitted=$submitted appSkipped=$skipped errors=$errors\nCameraX dropped frames: UNKNOWN (not exposed by KEEP_ONLY_LATEST)"
@@ -91,6 +97,7 @@ class LabController(private val worker: ExecutorService, private val publish: (S
         if ((state == 2 || state == 6) && result == 0L) {
             result = Native.finish(capture)
             running = false
+            if (enrolled != null) submitOwned()
             emit(token, report(JSONObject(Native.read(capture, result))))
         } else if (state == 4 || state == 5) {
             running = false
@@ -112,6 +119,24 @@ class LabController(private val worker: ExecutorService, private val publish: (S
             finally { pollQueued.set(false) }
         }
     }
+    private fun submitOwned() {
+        submissionAttempt++
+        try {
+            val receipt = enrolled?.submit(capture, result) ?: error("Secured enrollment required")
+            check(!receipt.optBoolean("product_eligible", true)) { "Unexpected product authorization" }
+            check(receipt.getBoolean("authenticated_receipt_accepted")) { "Receipt not accepted" }
+            submissionStatus = "Server acceptance (staging) attempt=$submissionAttempt: authenticated_receipt_accepted=true; " +
+                "acceptance_id=${receipt.getString("acceptance_id")}; payload_digest=${receipt.getString("payload_digest")}; " +
+                "capture_claims=client_reported; independent validation: registered signature, challenge, online revocation, reported shape. " +
+                "product_eligible=false; no verified camera provenance or manipulation verdict."
+        } catch (e: Exception) { submissionStatus = "Receipt submission failed attempt=$submissionAttempt: ${e.message}; no trusted fallback" }
+    }
+    fun submitReceipt() { worker.execute {
+        if (epoch.get() == token && result != 0L && enrolled != null) {
+            submitOwned(); emit(token, report(JSONObject(Native.read(capture, result))))
+        }
+    } }
+    internal fun loseEnrollmentKey() { worker.execute { enrolled?.deleteKey() } }
     fun finish() {
         worker.execute {
             if (epoch.get() != token || capture == 0L) return@execute

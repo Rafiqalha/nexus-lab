@@ -1,4 +1,4 @@
-// Generated from packaged header SHA256 8b45a3b30cc3062a1ef1df16a32327d1e205f0894420942d191925f2cc3086a6. Do not hand-edit.
+// Generated from packaged header SHA256 6e287b6d0f0cd33fa1ebc195c22ab990460d3265ce362b662625bdb8f185512f. Do not hand-edit.
 #[derive(Clone, Copy)]
 #[repr(C)]
 pub struct NexusV2Bytes {
@@ -215,6 +215,12 @@ unsafe extern "C" {
     pub fn nexus_v2_bootstrap_challenge_release(handle: u64) -> i32;
     pub fn nexus_v2_build_profile() -> u32;
     pub fn nexus_v2_capture_cancel(h: u64) -> i32;
+    pub fn nexus_v2_capture_create_bound_v1(
+        session: u64,
+        config: *const NexusV2CaptureConfigV2,
+        challenge: *const NexusV2SignedDocument,
+        out: *mut u64,
+    ) -> i32;
     pub fn nexus_v2_capture_create_v2(
         session: u64,
         config: *const NexusV2CaptureConfigV2,
@@ -225,6 +231,13 @@ unsafe extern "C" {
         h: u64,
         out: *mut NexusV2CaptureProgressV2,
         size: u32,
+    ) -> i32;
+    pub fn nexus_v2_capture_receipt_export_v1(
+        capture_handle: u64,
+        result_handle: u64,
+        out: *mut u8,
+        capacity: u32,
+        out_len: *mut u32,
     ) -> i32;
     pub fn nexus_v2_capture_release(h: u64) -> i32;
     pub fn nexus_v2_capture_result_read_v2(
