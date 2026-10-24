@@ -6,8 +6,10 @@ import subprocess
 serial = os.environ["ANDROID_SERIAL"]
 adb = ["adb", "-s", serial]
 launch = os.environ.get("NEXUS_SHELL_LAUNCH") == "1"
-process = subprocess.Popen(adb + ["shell", "am", "instrument", "-w", "-r",
-    "org.nexus.lab.test/androidx.test.runner.AndroidJUnitRunner"],
+args = ["shell", "am", "instrument", "-w", "-r"]
+if os.environ.get("NEXUS_TEST_CLASS"): args += ["-e", "class", os.environ["NEXUS_TEST_CLASS"]]
+if os.environ.get("NEXUS_TEST_PHASE"): args += ["-e", "persistent_phase", os.environ["NEXUS_TEST_PHASE"]]
+process = subprocess.Popen(adb + args + ["org.nexus.lab.test/androidx.test.runner.AndroidJUnitRunner"],
     stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
 current_test = ""
 with Path("build/device-instrumentation.log").open("w") as output:
@@ -17,7 +19,7 @@ with Path("build/device-instrumentation.log").open("w") as output:
         output.flush()
         if line.startswith("INSTRUMENTATION_STATUS: test="):
             current_test = line.split("=", 1)[1].strip()
-        if launch and line.strip() == "INSTRUMENTATION_STATUS_CODE: 1" and current_test.startswith(("realCamera", "securedStaging")):
+        if launch and line.strip() == "INSTRUMENTATION_STATUS_CODE: 1" and current_test.startswith(("realCamera", "securedStaging", "persistentEnrollment")):
             # Same public launcher intent used by ActivityScenario. Does not grant an
             # OEM background-launch permission, change keyguard, or change app code.
             result = subprocess.run(adb + ["shell", "am", "start", "-W", "-a",

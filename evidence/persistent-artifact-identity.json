@@ -1,0 +1,21 @@
+{
+  "apk_sha256": "801a3b5f0a34fc63f61c28c95b553735978ad5f0af1714cd918b3e73c04dea77",
+  "test_apk_sha256": "c9b8aaf7abf3a51e8d6be541a51b3c59256b341a5d728f05170985466eaf7d35",
+  "identity": {
+    "source_sha": "225b331c062debc04dc5a46b454bdbcee256d295",
+    "source_digest": "96623577cd32b916dde5a3797cbf4c0f46406c908a1ed3e4aab06f3c3b07f1d5",
+    "target": "aarch64-linux-android",
+    "staging_root_public_key": "36f931c634f728780664d725c0c819665f23249380c9069ae360b02bf9a5f883",
+    "profile": "staging-enrollment",
+    "abi": "2.11",
+    "package_directory": "vendor/android-arm64-staging-162a5ddef430",
+    "exports": 60,
+    "sdk_sha256": "162a5ddef4305d5e290290e70c4939716a86e5b482a617b974ee5fd2e7bd3237",
+    "header_sha256": "6e287b6d0f0cd33fa1ebc195c22ab990460d3265ce362b662625bdb8f185512f",
+    "package_manifest_sha256": "c41321ccba614fce94b30e6d685e44359db8d20527c4d87b7a6a2c075aa4670a",
+    "bridge_sha256": "f704068ae3e773010e2405103a6440514ad1a18b126f1918264a1c0645580e68"
+  },
+  "native_apk_matches_package_identity": true,
+  "installed_device_match": "NOT_RUN; ADB empty",
+  "hardware_tests": "NOT_RUN for new persistent milestone; prior physical receipt evidence remains historical"
+}

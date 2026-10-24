@@ -1,0 +1,34 @@
+{
+  "status": "PASS",
+  "scope": "Actual isolated staging journal migration via service entrypoint; no capture or hardware claim",
+  "service_sha": "45d2f141078af47422b0041d503a7b5ba239eba6",
+  "binary_sha256": "17dd70d1597f836117081b32296990cf7b89ca1e0e5da70e14b18545ad07b3c3",
+  "before_schema": 0,
+  "after_schema": 1,
+  "existing_tables_exactly_unchanged": {
+    "clock": {
+      "rows": 1,
+      "sha256": "a640021927829c77850876c218ebb86fb9c7322b8310542c799dc1ea1300ea34"
+    },
+    "challenges": {
+      "rows": 7,
+      "sha256": "835898d045ec788b5a66d88aeaedfeac0f02baa16f9a4c6c8b388c619ef9bf3f"
+    },
+    "enrollments": {
+      "rows": 7,
+      "sha256": "fa5a82eb6bcb19d16fb879a4408f022b56ad238f546a49d3c3ad30a26e831f21"
+    },
+    "revoked_keys": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "capture_challenges": {
+      "rows": 3,
+      "sha256": "aaaa0e6e0f474a295205c0635d172aa9c2e48900ac87c5e452986f3e61bc5e03"
+    }
+  },
+  "backfilled_grants": 7,
+  "backup_path": "/home/rafiq/.local/share/nexus-enrollment/backup-before-schema1-persistent-45d2f14.db",
+  "backup_sha256": "eee5f636656f7b4183ce8a901cead76ea3159d8cdb007dc0f27c3bc667c03f20",
+  "production_approved": false
+}

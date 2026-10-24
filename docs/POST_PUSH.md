@@ -36,3 +36,9 @@ The next workflow run must be assessed on its own SHA; no hosted PASS is inherit
 Run 40056975193 on path-fix 0b1a3c2 completed SUCCESS. Physical 7/7 follow-up now covers
 the final 0f01b21 service binary; exact artifacts, source identity, launcher requirement and
 new durable acceptance are in RECEIPT_FOLLOWUP_20261024.md/json. Earlier reports remain historical.
+
+## Persistent enrollment milestone
+
+SDK 225b331 has six hosted SUCCESS jobs (40081519310); service 45d2f14 has hosted SUCCESS
+(40081637626). New code, migration and local APK validation are in PERSISTENT_VALIDATION.md/json.
+New hardware reuse/restart testing is NOT_RUN while USB/ADB is empty; prior physical reports are historical.

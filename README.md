@@ -161,7 +161,7 @@ Official references:
 ## Device-bound receipt staging (ABI 2.11)
 
 Secured capture now requests a server-signed challenge and passes it to core before any frame.
-A distinct Keystore alias belongs to each enrollment/session; it is not silently replaced for an
+A persistent Keystore alias belongs to the device enrollment across sessions/processes; it is not silently replaced for an
 old receipt. Complete finalization exports the exact core-owned JWS signing input, signs it with the
 same enrolled key, converts Android DER to raw ES256 through Rust, revalidates and submits. The
 `Submit receipt / Retry` action retries only that live payload; missing/changed key requires explicit
@@ -178,3 +178,39 @@ CI builds default preview; isolated staging root campaigns belong to SDK/service
 TEE capture-to-server evidence remains a separate campaign and is never inferred from CI builds.
 
 Current receipt evidence: [RECEIPT_VALIDATION.md](docs/RECEIPT_VALIDATION.md).
+
+## Persistent enrollment / fresh authorization
+
+Staging has separate actions: Enroll device (first capture), Use existing enrollment (fresh authorized
+capture), and Delete local Nexus enrollment. Cancel/close releases SDK state and cached receipt input,
+not the enrollment key. Private keys stay in Keystore; bounded AtomicFile public metadata in
+noBackupFilesDir selects a candidate alias and remains untrusted. Server PoP and core nonce binding
+are verified anew. Missing/changed/revoked keys never create replacements or fall back to preview.
+
+A pending alias is recorded before generation. Process death/incomplete enrollment needs explicit
+reset; cleanup affects only that one recorded Nexus UUID alias, never other keys. Reset is local key
+removal, not server revocation. Stored metadata describes historical app/key attestation; fresh PoP
+does not re-inspect boot/application state. The service enforces certificate, attestation maximum age,
+revocation and stored app/signer/version/security policy.
+
+The same key can hold independent short SDK session grants. Capture passes explicit grant_id; neither
+new authorization nor closing another session changes enrollment revision. UI shows historical key
+level/verification time, fresh grant/expiry, capture/result validity and server acceptance separately.
+Production remains blocked. See SDK ADR 035 and service docs/PERSISTENT_ENROLLMENT.md.
+
+Physical campaign with existing metadata-only runner:
+
+```sh
+ANDROID_SERIAL=<device> NEXUS_SHELL_LAUNCH=1 python3 tools/run_instrumentation.py
+```
+
+For genuine process restart, run the persistent test in phase seed, end/force-stop its process, restart
+the service preserving its journal, then run phase reuse:
+
+```sh
+NEXUS_TEST_CLASS=org.nexus.lab.CameraLabTest#persistentEnrollmentAcrossSessionsAndProcessRestart \
+NEXUS_TEST_PHASE=seed ANDROID_SERIAL=<device> NEXUS_SHELL_LAUNCH=1 python3 tools/run_instrumentation.py
+# Explicit process stop/service restart; no fixed sleep used as an ordering proof.
+NEXUS_TEST_CLASS=org.nexus.lab.CameraLabTest#persistentEnrollmentAcrossSessionsAndProcessRestart \
+NEXUS_TEST_PHASE=reuse ANDROID_SERIAL=<device> NEXUS_SHELL_LAUNCH=1 python3 tools/run_instrumentation.py
+```

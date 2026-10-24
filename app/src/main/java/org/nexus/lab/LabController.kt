@@ -45,7 +45,7 @@ class LabController(private val worker: ExecutorService, private val publish: (S
     private var sdk = Timings()
     private var analyzer = Timings()
     private fun emit(t: Long, message: String) { main.post { if (epoch.get() == t) publish(message) } }
-    fun start(secured: Boolean = false) {
+    fun start(secured: Boolean = false, enrollNew: Boolean = false) {
         val t = epoch.incrementAndGet()
         val previous = cancellable.getAndSet(0)
         if (previous != 0L) Native.cancel(previous)
@@ -55,7 +55,7 @@ class LabController(private val worker: ExecutorService, private val publish: (S
             token = t
             try {
                 if (secured) {
-                    val opened = Enrollment.open(); enrolled = opened; session = opened.handle; enrollmentStatus = opened.status
+                    val opened = Enrollment.open(enrollNew); enrolled = opened; session = opened.handle; enrollmentStatus = opened.status
                 } else { session = Native.open(); enrollmentStatus = "PREVIEW: no enrollment or platform evidence" }
                 submissionAttempt = 0
                 submissionStatus = "Server acceptance: not submitted"
@@ -67,6 +67,12 @@ class LabController(private val worker: ExecutorService, private val publish: (S
                 emit(t, "Capturing\n$enrollmentStatus\n${Native.capabilities(session)}")
             } catch (e: Exception) { cleanup(); emit(t, "Start failed: ${e.message}") }
         }
+    }
+    fun resetEnrollment() {
+        stop("Resetting local enrollment")
+        val t = epoch.get()
+        worker.execute { try { Enrollment.reset(); emit(t,"Local enrollment deleted; explicit enrollment required") }
+            catch (e: Exception) { emit(t,"Enrollment reset failed: ${e.message}") } }
     }
     fun stop(reason: String) {
         val t = epoch.incrementAndGet()

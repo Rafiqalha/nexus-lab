@@ -65,7 +65,9 @@ class CameraLabTest {
         org.junit.Assume.assumeTrue(BuildConfig.NEXUS_STAGING)
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
             await(scenario) { it.contains("SDK loaded") }
-            scenario.onActivity { it.labStartSecured() }
+            scenario.onActivity { it.labResetEnrollment() }
+            await(scenario) { it.contains("Local enrollment deleted") }
+            scenario.onActivity { it.labStartEnrollment() }
             val final = await(scenario, 30000) { it.contains("\"current_result_valid\": true") }
             assertComplete(final, true)
             assertTrue(final.contains("STAGING enrollment="))
@@ -86,6 +88,42 @@ class CameraLabTest {
             scenario.onActivity { it.labSubmitReceipt() }
             await(scenario) { it.contains("Receipt submission failed") }
             record("secured_staging_expiry", expired)
+        }
+    }
+    @Test fun persistentEnrollmentAcrossSessionsAndProcessRestart() {
+        org.junit.Assume.assumeTrue(BuildConfig.NEXUS_STAGING)
+        val context=InstrumentationRegistry.getInstrumentation().targetContext
+        Enrollment.initialize(context)
+        val phase=InstrumentationRegistry.getArguments().getString("persistent_phase", "full")
+        var expectedKey=""
+        fun capture(enroll:Boolean):String {
+            ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+                await(scenario) { it.contains("SDK loaded") }
+                if(enroll) {
+                    scenario.onActivity { it.labResetEnrollment() }; await(scenario) { it.contains("Local enrollment deleted") }
+                    scenario.onActivity { it.labStartEnrollment() }
+                } else scenario.onActivity { it.labStartSecured() }
+                val final=await(scenario,30000) { it.contains("authenticated_receipt_accepted=true") && it.contains("\"current_result_valid\": true") }
+                assertComplete(final,true)
+                val key=Regex("Enrollment key=([0-9a-f]{64})").find(final)!!.groupValues[1]
+                if(expectedKey.isNotEmpty()) assertEquals(expectedKey,key)
+                record("persistent_$phase",final)
+                return key
+            }
+        }
+        if(phase=="reuse") {
+            expectedKey=Regex("key=([0-9a-f]{64})").find(Enrollment.describe())!!.groupValues[1]
+            capture(false)
+        } else {
+            expectedKey=capture(true)
+            assertTrue(Enrollment.describe().contains(expectedKey))
+            if(phase=="full") {
+                capture(false)
+                Enrollment.reset()
+                assertTrue(Enrollment.describe().contains("unavailable"))
+                assertTrue(runCatching { Enrollment.open() }.isFailure)
+                record("persistent_reset","PASS: explicit local reset stops reuse; no replacement")
+            }
         }
     }
     @Test fun realCameraPortraitReversePortraitBackgroundCancelRestartAndFinalValidation() {

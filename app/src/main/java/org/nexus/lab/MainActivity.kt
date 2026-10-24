@@ -42,6 +42,7 @@ class MainActivity : ComponentActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Enrollment.initialize(applicationContext)
         window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(24, 16, 24, 16) }
         root.addView(TextView(this).apply { text = "NEXUS · EXTERNAL ANDROID LAB\n" + (if (BuildConfig.NEXUS_STAGING) "ISOLATED STAGING · explicit preview available" else "PREVIEW") + "\nNo production / identity / liveness verdict"; textSize = 17f })
@@ -54,18 +55,24 @@ class MainActivity : ComponentActivity() {
         buttons.addView(Button(this).apply { text = "Check"; setOnClickListener { controller.validate() } })
         root.addView(buttons)
         if (BuildConfig.NEXUS_STAGING) root.addView(Button(this).apply {
-            text = "Enroll new key + secured STAGING capture"
+            text = "Use existing enrollment + secured capture"
             setOnClickListener { if (loaded && hasCameraPermission()) { if (analysis == null) bindCamera(); controller.start(true) } }
         })
         if (BuildConfig.NEXUS_STAGING) root.addView(Button(this).apply {
             text = "Submit receipt / Retry"; setOnClickListener { controller.submitReceipt() }
+        })
+        if (BuildConfig.NEXUS_STAGING) root.addView(Button(this).apply {
+            text = "Enroll device + first secured capture"; setOnClickListener { if (loaded && hasCameraPermission()) controller.start(true, true) }
+        })
+        if (BuildConfig.NEXUS_STAGING) root.addView(Button(this).apply {
+            text = "Delete local Nexus enrollment"; setOnClickListener { controller.resetEnrollment() }
         })
         status = TextView(this).apply { text = "Loading verified SDK package…"; textSize = 12f; setTextIsSelectable(true) }
         root.addView(ScrollView(this).apply { addView(status) }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
         setContentView(root)
         controller = LabController(worker) { status.text = it }
         worker.execute {
-            try { val id = Native.load(this); runOnUiThread { loaded = true; status.text = "SDK loaded; tap Start.\n$id" } }
+            try { val id = Native.load(this); runOnUiThread { loaded = true; status.text = "SDK loaded; tap Start.\n${if (BuildConfig.NEXUS_STAGING) Enrollment.describe() else "PREVIEW"}\n$id" } }
             catch (e: Throwable) { runOnUiThread { status.text = "Library load failed: ${e.message}" } }
         }
     }
@@ -76,6 +83,8 @@ class MainActivity : ComponentActivity() {
     internal fun labSdkInFlight() = controller.sdkInFlight
     internal fun labStart() = controller.start()
     internal fun labStartSecured() = controller.start(true)
+    internal fun labStartEnrollment() = controller.start(true, true)
+    internal fun labResetEnrollment() = controller.resetEnrollment()
     internal fun labFinish() = controller.finish()
     internal fun labCancel() = controller.stop("Cancelled")
     private fun hasCameraPermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED

@@ -1,0 +1,162 @@
+{
+  "milestone": "Persistent device enrollment and fresh session authorization \u2014 isolated staging",
+  "baseline_lab": "fba374c63a25e43e1ea67d9d806f3e77321818b3",
+  "sdk_sha": "225b331c062debc04dc5a46b454bdbcee256d295",
+  "service_sha": "45d2f141078af47422b0041d503a7b5ba239eba6",
+  "source_files": {
+    "app/src/main/java/org/nexus/lab/LabController.kt": "feebdaff240b5b95b6109ed24e67045a604d27cac7468f3fb66f272c9e65d6f5",
+    "app/src/main/java/org/nexus/lab/Native.kt": "aa8a9be584a6695be2ea86c3140a1dbd5a2c3fca39d4fdec6bc56f782f4c7bab",
+    "app/src/main/java/org/nexus/lab/FrameAdapter.kt": "f7122afcd23749428c290b1cec9bcab15ab6043dc5451a8107cb1869df3ec0d2",
+    "app/src/main/java/org/nexus/lab/Timings.kt": "c59de5040306e3ab92f4ff0bdbf19593d444e4ef4da0183e210b9c6244bebb9e",
+    "app/src/main/java/org/nexus/lab/MainActivity.kt": "72a5156d1586203cde5ba114dcf7f233ac8c6c848f92ce78d0eff814f1753542",
+    "app/src/main/java/org/nexus/lab/Enrollment.kt": "ad33d44fb50a86a7cec1a7234516f4ec87e2dc195d1c0726ac56727591ee5e09",
+    "app/src/androidTest/java/org/nexus/lab/BridgeTest.kt": "b42480e0a2daede584e05807e12c8bb608d05c8cce9cd16ab5d0a722049bd24d",
+    "app/src/androidTest/java/org/nexus/lab/CameraLabTest.kt": "e0557c19e7479415088e9c771bd9661cb617aa487d0293c2055c29aef2bc80c6",
+    "app/src/test/java/org/nexus/lab/EnrollmentPurposeTest.kt": "49485d305d2ed31137db7670a13a168e4d58aa89b3bdf2e0a6f9a7566bb8dc54",
+    "app/src/test/java/org/nexus/lab/FrameAdapterTest.kt": "96cf5d2ec607f34d3dae0f8af4b7c881742589157258adfe86ff70ce45235b6f",
+    "native/src/sdk.rs": "ed8cfb604fb12fe688f9599b85639b81ba9735b273c6dcc057aca348312a7280",
+    "native/src/enrollment.rs": "6b0b22d60411cf47ad8d7eedbf6fec98b5924798ac31e550c5555972c3781ebe",
+    "native/src/lib.rs": "5c4dfbfbcfe3d22d02429981eeced48bf97254c8397e23d27109a77836769c60",
+    "tools/run_instrumentation.py": "a6fd738a2a48b3d83c86aa21634bf0b81e5fd7fd7b4247897643901d2e60ac5b",
+    "tools/host_jni.sh": "8f6add2cb18410b5a7c025ac820220620807f6cd26ce18d0b2d50e0f1567ea3c",
+    "tools/prepare_sdk.sh": "290278d50f876c737a1f6cf9e272abadd604daf5a2654ef745b528d3c69ad2be",
+    "tools/generate_bindings.py": "e8d9badd0c0c2cc394651c9ec8120aec01d20ec39125b177e4e7189a48663dbd",
+    "tools/build_android.sh": "875701a29176bb153ce05d4894fc7b4a91b4665b9ccce00a93cc549b41619ae4",
+    "tools/collect_notices.py": "437f2ff4893257996d5a7f4194a822a8599db8b3e4da289c15d7ffe18fb38e3a",
+    "tools/device_tests.sh": "020871aae10a4fb45ec0537f2c255127a38a5cc17d5a8410117ce82df13a55ee",
+    "tools/import_sdk.py": "1bf53ddffbc56220b36dc617f3bc7d14bc8edd4cdd49021fd9523a3c339810f1",
+    "tools/jvm/org/nexus/lab/Native.java": "98e8f553c7f8cb5e43904f8072ba9f6e3e94a5d24c684fdc3576006065527476"
+  },
+  "source_digest": "a68ce4d5adea2b0858254cd52a8729b28c140c6c07a5c4071f85b23e75639007",
+  "checks": [
+    {
+      "command": "python3 tools/import_sdk.py <ARM64 package> 225b331 --staging",
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "evidence/persistent-import.log",
+      "sha256": "3b8826e3dd0e305eaa8ce3af99e2ab21a9137699f38f80f5e055a677749cce17"
+    },
+    {
+      "command": "NEXUS_SDK_PACKAGE=<packaged default host SDK> tools/host_jni.sh",
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "evidence/persistent-host-jni.log",
+      "sha256": "a47da67b0a2e5e65f8b986d7a90d9937840ac034f7d53671d49d4530cde75ba6"
+    },
+    {
+      "command": "tools/build_android.sh (explicit staging profile)",
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "evidence/persistent-build-android-pop.log",
+      "sha256": "72181cce6703a44c095654614be3994d5113e29a472b148e5d68e43dd068b11e"
+    },
+    {
+      "command": "./gradlew --no-daemon -PnexusStaging=true :app:lintRelease",
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "evidence/persistent-lint-pop.log",
+      "sha256": "f1c4bc554c95b8f1796670875f41bc2334dd142cc50951ccd427eb73652ddf28"
+    },
+    {
+      "command": "apksigner verify --verbose --print-certs release APK",
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "evidence/persistent-apk-signature.log",
+      "sha256": "6e38dd199f0d42d785186a127ae3ff13f99ad2168b9539504adef4568f2588a9"
+    },
+    {
+      "command": "zipalign -c -P 16 -v 4 release APK",
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "evidence/persistent-apk-alignment.log",
+      "sha256": "55b6007fb6b223e072e9d06cc9d5dc3eb2b8cb986473d52dd43f608c7c683078"
+    }
+  ],
+  "jvm_unit_suites": [
+    {
+      "suite": "org.nexus.lab.EnrollmentPurposeTest",
+      "tests": 1
+    },
+    {
+      "suite": "org.nexus.lab.FrameAdapterTest",
+      "tests": 3
+    }
+  ],
+  "artifact": {
+    "apk_sha256": "801a3b5f0a34fc63f61c28c95b553735978ad5f0af1714cd918b3e73c04dea77",
+    "test_apk_sha256": "c9b8aaf7abf3a51e8d6be541a51b3c59256b341a5d728f05170985466eaf7d35",
+    "identity": {
+      "source_sha": "225b331c062debc04dc5a46b454bdbcee256d295",
+      "source_digest": "96623577cd32b916dde5a3797cbf4c0f46406c908a1ed3e4aab06f3c3b07f1d5",
+      "target": "aarch64-linux-android",
+      "staging_root_public_key": "36f931c634f728780664d725c0c819665f23249380c9069ae360b02bf9a5f883",
+      "profile": "staging-enrollment",
+      "abi": "2.11",
+      "package_directory": "vendor/android-arm64-staging-162a5ddef430",
+      "exports": 60,
+      "sdk_sha256": "162a5ddef4305d5e290290e70c4939716a86e5b482a617b974ee5fd2e7bd3237",
+      "header_sha256": "6e287b6d0f0cd33fa1ebc195c22ab990460d3265ce362b662625bdb8f185512f",
+      "package_manifest_sha256": "c41321ccba614fce94b30e6d685e44359db8d20527c4d87b7a6a2c075aa4670a",
+      "bridge_sha256": "f704068ae3e773010e2405103a6440514ad1a18b126f1918264a1c0645580e68"
+    },
+    "native_apk_matches_package_identity": true,
+    "installed_device_match": "NOT_RUN; ADB empty",
+    "hardware_tests": "NOT_RUN for new persistent milestone; prior physical receipt evidence remains historical"
+  },
+  "live_service_migration": {
+    "status": "PASS",
+    "scope": "Actual isolated staging journal migration via service entrypoint; no capture or hardware claim",
+    "service_sha": "45d2f141078af47422b0041d503a7b5ba239eba6",
+    "binary_sha256": "17dd70d1597f836117081b32296990cf7b89ca1e0e5da70e14b18545ad07b3c3",
+    "before_schema": 0,
+    "after_schema": 1,
+    "existing_tables_exactly_unchanged": {
+      "clock": {
+        "rows": 1,
+        "sha256": "a640021927829c77850876c218ebb86fb9c7322b8310542c799dc1ea1300ea34"
+      },
+      "challenges": {
+        "rows": 7,
+        "sha256": "835898d045ec788b5a66d88aeaedfeac0f02baa16f9a4c6c8b388c619ef9bf3f"
+      },
+      "enrollments": {
+        "rows": 7,
+        "sha256": "fa5a82eb6bcb19d16fb879a4408f022b56ad238f546a49d3c3ad30a26e831f21"
+      },
+      "revoked_keys": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "capture_challenges": {
+        "rows": 3,
+        "sha256": "aaaa0e6e0f474a295205c0635d172aa9c2e48900ac87c5e452986f3e61bc5e03"
+      }
+    },
+    "backfilled_grants": 7,
+    "backup_path": "/home/rafiq/.local/share/nexus-enrollment/backup-before-schema1-persistent-45d2f14.db",
+    "backup_sha256": "eee5f636656f7b4183ce8a901cead76ea3159d8cdb007dc0f27c3bc667c03f20",
+    "production_approved": false
+  },
+  "hosted_ci": [
+    {
+      "repo": "nexus-sdk",
+      "sha": "225b331c062debc04dc5a46b454bdbcee256d295",
+      "run": 40081519310,
+      "status": "SUCCESS",
+      "jobs": 6
+    },
+    {
+      "repo": "nexus-enrollment",
+      "sha": "45d2f141078af47422b0041d503a7b5ba239eba6",
+      "run": 40081637626,
+      "status": "SUCCESS"
+    }
+  ],
+  "lab_hosted_ci": "NOT_RUN at report creation; check exact pushed SHA after push",
+  "hardware_status": "BLOCKED: device absent from USB/ADB after daemon restart; user readiness question pending",
+  "hardware_tests": "NOT_RUN on new code. Prior 7/7 TEE receipt results are historical, not persistent enrollment evidence. Synthetic StrongBox PASS is service-only, not hardware.",
+  "process_restart_host": "PASS: service HTTP processes A/B/C preserve fresh authorization and both receipts. Android seed/reuse phases implemented but NOT_RUN.",
+  "production_approved": false,
+  "product_eligible": false,
+  "retained_initial_failure": "persistent-import-initial-denial.log: importer correctly required explicit --staging; repeated with flag and PASS."
+}
