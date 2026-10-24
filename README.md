@@ -214,3 +214,5 @@ NEXUS_TEST_PHASE=seed ANDROID_SERIAL=<device> NEXUS_SHELL_LAUNCH=1 python3 tools
 NEXUS_TEST_CLASS=org.nexus.lab.CameraLabTest#persistentEnrollmentAcrossSessionsAndProcessRestart \
 NEXUS_TEST_PHASE=reuse ANDROID_SERIAL=<device> NEXUS_SHELL_LAUNCH=1 python3 tools/run_instrumentation.py
 ```
+
+Policy evolution and actionable enrollment states: [POLICY_EVOLUTION.md](docs/POLICY_EVOLUTION.md).

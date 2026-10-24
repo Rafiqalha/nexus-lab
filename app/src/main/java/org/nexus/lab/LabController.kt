@@ -71,7 +71,7 @@ class LabController(private val worker: ExecutorService, private val publish: (S
     fun resetEnrollment() {
         stop("Resetting local enrollment")
         val t = epoch.get()
-        worker.execute { try { Enrollment.reset(); emit(t,"Local enrollment deleted; explicit enrollment required") }
+        worker.execute { try { Enrollment.reset(); emit(t,"Local enrollment deleted; server revocation was not requested. Explicit enrollment required") }
             catch (e: Exception) { emit(t,"Enrollment reset failed: ${e.message}") } }
     }
     fun stop(reason: String) {

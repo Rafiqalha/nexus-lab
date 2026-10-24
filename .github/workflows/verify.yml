@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: Rafiqalha/nexus-sdk
-          ref: 225b331c062debc04dc5a46b454bdbcee256d295
+          ref: 82b73a13a40d466aaa2aa236c433d57896036918
           ssh-key: ${{ secrets.NEXUS_SDK_READ_KEY }}
           path: nexus-sdk
           fetch-depth: 0
@@ -32,10 +32,21 @@ jobs:
         working-directory: nexus-lab
         run: |
           (cd ../nexus-sdk && cargo run -p xtask --locked -- package --target x86_64-unknown-linux-gnu --output dist/ci-lab-host)
-          NEXUS_SDK_PACKAGE="$GITHUB_WORKSPACE/nexus-sdk/dist/ci-lab-host" tools/host_jni.sh
+          NEXUS_SDK_PACKAGE="$GITHUB_WORKSPACE/nexus-sdk/dist/ci-lab-host" python3 tools/ci_evidence.py host-jni -- tools/host_jni.sh
       - name: ARM64 release build, JVM tests and lint; no physical-device claim
         working-directory: nexus-lab
         run: |
           tools/prepare_sdk.sh ../nexus-sdk dist/ci-lab-android
-          tools/build_android.sh
-          ./gradlew --no-daemon :app:lintRelease
+          python3 tools/ci_evidence.py android-build -- tools/build_android.sh
+          python3 tools/ci_evidence.py android-lint -- ./gradlew --no-daemon :app:lintRelease
+      - name: Collect safe host/JVM and source/binary evidence
+        if: always()
+        working-directory: nexus-lab
+        run: python3 tools/ci_evidence.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: lab-evidence-${{ github.sha }}
+          path: nexus-lab/build/ci-evidence/*.json
+          if-no-files-found: error
+          retention-days: 14

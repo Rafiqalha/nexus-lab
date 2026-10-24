@@ -1,0 +1,136 @@
+{
+  "milestone": "Enrollment Policy Evolution & Persistent Device Trust \u2014 isolated staging",
+  "baseline": "37a1faeb3a53f661cdd855273454bb1c95867f90",
+  "sdk_sha": "82b73a13a40d466aaa2aa236c433d57896036918",
+  "service_sha": "0a8b14fcc8c1417f0f6fbbacf241fa1693d78986",
+  "source_digest": "85705d626da5345fab2c59fde0e93df2566feeb92e79804ca17a6d7944f50044",
+  "source_digest_scope": "native and Kotlin source/tests, tools, workflows, Cargo/Gradle manifests and imported SDK identity; excludes reports and user gradlew.bat change",
+  "source_files": {
+    ".github/workflows/verify.yml": "edd07a655247a6f5546b4e3df941c24de2e4e96c87bb5f809ad08f80414f14b6",
+    "Cargo.lock": "885dd0538de229b85716a05d866317ae02fd598a27f440ec650397c4e85b4949",
+    "Cargo.toml": "f51d67c2631f2cc80bc72a0b1efc55ce201c2063521ab7e51dde2fda3ab42a3e",
+    "SDK_IDENTITY.json": "8cdfc25795a46c6f78cf4103341b218bdb243db90b0dae83c30a7facba0ae8c7",
+    "app/build.gradle.kts": "ecac71984013a5e3c55061ce48901f29d1a18a5d2cfced8ac992061f3a5042ce",
+    "app/src/androidTest/java/org/nexus/lab/BridgeTest.kt": "b42480e0a2daede584e05807e12c8bb608d05c8cce9cd16ab5d0a722049bd24d",
+    "app/src/androidTest/java/org/nexus/lab/CameraLabTest.kt": "e0557c19e7479415088e9c771bd9661cb617aa487d0293c2055c29aef2bc80c6",
+    "app/src/main/java/org/nexus/lab/Enrollment.kt": "3d5a6f18b4c3edceacf7e40b47f082aa9193e59fabcfdc68fec4915643164ce9",
+    "app/src/main/java/org/nexus/lab/EnrollmentStatus.kt": "f331095b1650f83b2278fabdf3fbcd7e809130664b940ab756d26c2ce94d9cba",
+    "app/src/main/java/org/nexus/lab/FrameAdapter.kt": "f7122afcd23749428c290b1cec9bcab15ab6043dc5451a8107cb1869df3ec0d2",
+    "app/src/main/java/org/nexus/lab/LabController.kt": "ba69105d8cd9ddb5b05989823087587b21cffadbb08e78684469a5fe0faa74e2",
+    "app/src/main/java/org/nexus/lab/MainActivity.kt": "72a5156d1586203cde5ba114dcf7f233ac8c6c848f92ce78d0eff814f1753542",
+    "app/src/main/java/org/nexus/lab/Native.kt": "aa8a9be584a6695be2ea86c3140a1dbd5a2c3fca39d4fdec6bc56f782f4c7bab",
+    "app/src/main/java/org/nexus/lab/Timings.kt": "c59de5040306e3ab92f4ff0bdbf19593d444e4ef4da0183e210b9c6244bebb9e",
+    "app/src/test/java/org/nexus/lab/EnrollmentPurposeTest.kt": "49485d305d2ed31137db7670a13a168e4d58aa89b3bdf2e0a6f9a7566bb8dc54",
+    "app/src/test/java/org/nexus/lab/EnrollmentStatusTest.kt": "9fb0a1f63687f846a9850b449510538408fb0ad724e97ec8012831309222693f",
+    "app/src/test/java/org/nexus/lab/FrameAdapterTest.kt": "96cf5d2ec607f34d3dae0f8af4b7c881742589157258adfe86ff70ce45235b6f",
+    "build.gradle.kts": "329036499b58c82966a8dabcbc172c4e2804bbb96b775fb656770e6555da3084",
+    "native/src/enrollment.rs": "6b0b22d60411cf47ad8d7eedbf6fec98b5924798ac31e550c5555972c3781ebe",
+    "native/src/lib.rs": "5c4dfbfbcfe3d22d02429981eeced48bf97254c8397e23d27109a77836769c60",
+    "native/src/sdk.rs": "ed8cfb604fb12fe688f9599b85639b81ba9735b273c6dcc057aca348312a7280",
+    "settings.gradle.kts": "17bd5d8f29bf6f03e59c807305e83752e43229df28db518f963e43a5e9c1b6bf",
+    "tools/build_android.sh": "875701a29176bb153ce05d4894fc7b4a91b4665b9ccce00a93cc549b41619ae4",
+    "tools/ci_evidence.py": "04c15b0833dbc1608fb5d3f58ce464e73df47eda926312f47ce51ce79dc12b97",
+    "tools/collect_notices.py": "437f2ff4893257996d5a7f4194a822a8599db8b3e4da289c15d7ffe18fb38e3a",
+    "tools/device_tests.sh": "020871aae10a4fb45ec0537f2c255127a38a5cc17d5a8410117ce82df13a55ee",
+    "tools/generate_bindings.py": "e8d9badd0c0c2cc394651c9ec8120aec01d20ec39125b177e4e7189a48663dbd",
+    "tools/host_jni.sh": "8f6add2cb18410b5a7c025ac820220620807f6cd26ce18d0b2d50e0f1567ea3c",
+    "tools/import_sdk.py": "1bf53ddffbc56220b36dc617f3bc7d14bc8edd4cdd49021fd9523a3c339810f1",
+    "tools/jvm/org/nexus/lab/Native.java": "98e8f553c7f8cb5e43904f8072ba9f6e3e94a5d24c684fdc3576006065527476",
+    "tools/prepare_sdk.sh": "290278d50f876c737a1f6cf9e272abadd604daf5a2654ef745b528d3c69ad2be",
+    "tools/run_instrumentation.py": "a6fd738a2a48b3d83c86aa21634bf0b81e5fd7fd7b4247897643901d2e60ac5b"
+  },
+  "sdk_identity": {
+    "source_sha": "82b73a13a40d466aaa2aa236c433d57896036918",
+    "source_digest": "daa8612bd66f276238575027ba1bf9826b01b7dc33877da9c72439b128091b06",
+    "target": "aarch64-linux-android",
+    "staging_root_public_key": "36f931c634f728780664d725c0c819665f23249380c9069ae360b02bf9a5f883",
+    "profile": "staging-enrollment",
+    "abi": "2.11",
+    "package_directory": "vendor/android-arm64-staging-26049f6035ea",
+    "exports": 60,
+    "sdk_sha256": "26049f6035ea6b1fa4aa72751d9bb738f97b566f09a21d15b7893e95844bfbf9",
+    "header_sha256": "6e287b6d0f0cd33fa1ebc195c22ab990460d3265ce362b662625bdb8f185512f",
+    "package_manifest_sha256": "96366401efdd4154d24f979411f44be13c2ad649d0489849497b6aec014cad7f"
+  },
+  "binary_sha256": {
+    "app/build/outputs/apk/release/app-release.apk": "1c2b4c9c8b0306e96223863fa16442495facb96c256daf0ec7438df9d281f0dc",
+    "app/build/outputs/apk/debug/app-debug.apk": "d46e4a4a48e7edd017aae6c571aebbaab5a3a2a33e214159fb5066e81e85bdca",
+    "app/build/outputs/apk/androidTest/release/app-release-androidTest.apk": "ccaff30aa22634526b594b2f582c5b4672f55e78d3291d0cc57df48f257819d5",
+    "app/src/main/jniLibs/arm64-v8a/libnexus_lab.so": "afedfe3a7ec2feef8dc2ecf9844037bd192c1c7bdb2a055c12e77fb9c9272336",
+    "app/src/main/jniLibs/arm64-v8a/libnexus_sdk.so": "26049f6035ea6b1fa4aa72751d9bb738f97b566f09a21d15b7893e95844bfbf9"
+  },
+  "checks": [
+    {
+      "name": "host-jni",
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "/tmp/nexus-lab-policy-host.log",
+      "sha256": "74888f1407ebaa9f0222b85e073e5f75ac8d318702ac5b6b35b11dfbab2358ad",
+      "rust_tests_in_configuration": 1
+    },
+    {
+      "name": "android-default-build",
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "/tmp/nexus-lab-policy-android-build.log",
+      "sha256": "c5c2c475826dcafcf21c4b983e1029c2a66e8fdeb86b90dd691d6aa64d50499a"
+    },
+    {
+      "name": "android-default-lint",
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "/tmp/nexus-lab-policy-android-lint.log",
+      "sha256": "f9e052008cf68365002845fa93927d5c6f3d0e394978af741d3c9afbc5cb0090"
+    },
+    {
+      "name": "android-staging-build",
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "/tmp/nexus-lab-policy-staging-build.log",
+      "sha256": "5f55bdd7baa0f620f45593c4e054185931a7dbcb56a90fe22966c2aad3915971"
+    },
+    {
+      "name": "android-staging-lint",
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "/tmp/nexus-lab-policy-staging-lint.log",
+      "sha256": "b2cc408df225d9c4cf8c23ac247cbabab77d483322adf8e13647d8a0080a1b6a"
+    }
+  ],
+  "junit_summaries": [
+    {
+      "name": "org.nexus.lab.FrameAdapterTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "org.nexus.lab.EnrollmentPurposeTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "org.nexus.lab.EnrollmentStatusTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "unique_jvm_tests": 8,
+  "default_and_staging_are_configurations_not_unique_tests": true,
+  "hardware": "NOT_RUN/BLOCKED: ADB inventory empty; no device campaign source or APK is claimed used on hardware",
+  "physical_key_reuse": "NOT_RUN for final APK; host service synthetic campaigns independently verify key/ID reuse and policy behavior",
+  "production_approved": false,
+  "baseline_hosted_ci": {
+    "sha": "37a1faeb3a53f661cdd855273454bb1c95867f90",
+    "run": 40084609172,
+    "status": "SUCCESS"
+  },
+  "current_hosted_ci": "NOT_RUN until push; verify exact new SHA afterward",
+  "preserved_local_change": "gradlew.bat left untouched and excluded from commit",
+  "retained_initial_failure": "Gradle verifySdk refused the unprepared checkout; normal import/build pipeline subsequently passed default and staging"
+}

@@ -107,9 +107,9 @@ object Enrollment {
             } ?: byteArrayOf()
             check(raw.size <= 256 * 1024) { "Response exceeds bound" }
             val response = JSONObject(String(raw, Charsets.UTF_8))
-            check(code == 200) { "Enrollment refused: ${response.optString("error", "service unavailable")}" }
+            check(code == 200) { EnrollmentStatus.refusal(response.optString("error", "service_unavailable")) }
             return response
-        } catch (e: java.io.IOException) { throw IllegalStateException("Service unavailable; secured authorization failed", e) } finally { c.disconnect() }
+        } catch (e: java.io.IOException) { throw IllegalStateException("Service unavailable; retry fresh authorization later. Local key and enrollment metadata are retained", e) } finally { c.disconnect() }
     }
     internal fun requirePoPPurpose(bytes: ByteArray, kind: String) {
         check(kind == "nexus.enrollment-pop.staging.v1" || kind == "nexus.session-authorization-pop.staging.v1")
@@ -175,16 +175,21 @@ object Enrollment {
             val accepted = JSONObject(Native.stageComplete(session,bootstrap,bundle.toString()))
             check(accepted.getInt("sdk_status") == 0) { "Core rejected provisioning" }
             val enrollment = accepted.getJSONObject("enrollment")
-            if (!enrollNew) check(listOf("enrollment_id","key_sha256","attestation_sha256","application_id","signer_sha256","security_level").all { enrollment.getString(it) == previous!!.getJSONObject("enrollment").getString(it) }) { "Enrollment identity changed; reset explicitly" }
-            val opened = DeviceSession(session,alias,enrollment,bundle.getString("grant_id"),"STAGING enrollment=${enrollment.getString("enrollment_id")}\n" +
+            if (!enrollNew) check(listOf("enrollment_id","key_sha256").all { enrollment.getString(it) == previous!!.getJSONObject("enrollment").getString(it) }) { "Enrollment identity changed; reset explicitly" }
+            // Core has accepted the signed policy/provisioning; local metadata is a historical hint only.
+            val provisioning = JSONObject(String(Base64.decode(bundle.getJSONObject("response").getString("bytes"), Base64.NO_WRAP), Charsets.UTF_8))
+            val policyContext = provisioning.getString("policy_id")
+            val policyChanged = !enrollNew && previous!!.optString("policy_context").isNotEmpty() && previous.optString("policy_context") != policyContext
+            val policyStatus = if (policyChanged) "Policy changed; fresh authorization accepted using the existing key." else "Enrollment active; fresh session authorization available."
+            val opened = DeviceSession(session,alias,enrollment,bundle.getString("grant_id"),"$policyStatus\nSTAGING enrollment=${enrollment.getString("enrollment_id")}\nPolicy context=$policyContext\n" +
                 "Enrollment key=${enrollment.getString("key_sha256")}\nValidated key level=${enrollment.getString("security_level")} (historical attestation)\n" +
                 "Fresh session authorization grant=${bundle.getString("grant_id")} expires_ms=${bundle.getLong("expires_ms")}\n" +
                 "Attestation verified_at_ms=${bundle.getLong("attestation_verified_at_ms")} attested app version=${bundle.getLong("attested_application_version")}\n" +
                 "Provisioning=${accepted.getInt("provisioning_status")} continuity=${accepted.getInt("continuity_status")}\n" +
                 "No fresh boot/app inspection, camera provenance, liveness or production eligibility.")
             opened.checkRegisteredKey()
-            if (enrollNew) persist(JSONObject().put("schema",1).put("state","active").put("alias",alias).put("enrollment",enrollment)
-                .put("verified_at_ms",bundle.getLong("attestation_verified_at_ms")).put("application_version",bundle.getLong("attested_application_version")))
+            persist(JSONObject().put("schema",1).put("state","active").put("alias",alias).put("enrollment",enrollment)
+                .put("verified_at_ms",bundle.getLong("attestation_verified_at_ms")).put("application_version",bundle.getLong("attested_application_version")).put("policy_context",policyContext))
             return opened
         } catch (e: Throwable) { Native.stageAbort(session,bootstrap); throw e }
     }
