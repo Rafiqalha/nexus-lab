@@ -36,6 +36,8 @@ jobs:
       - name: ARM64 release build, JVM tests and lint; no physical-device claim
         working-directory: nexus-lab
         run: |
+          python3 -m unittest tools/test_import_sdk.py -v
+          python3 -O -m unittest tools/test_import_sdk.py -v
           tools/prepare_sdk.sh ../nexus-sdk dist/ci-lab-android
           python3 tools/ci_evidence.py android-build -- tools/build_android.sh
           python3 tools/ci_evidence.py android-lint -- ./gradlew --no-daemon :app:lintRelease

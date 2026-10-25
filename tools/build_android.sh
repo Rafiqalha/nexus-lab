@@ -17,7 +17,9 @@ from pathlib import Path
 r=Path.cwd();p=r/'app/src/main/jniLibs/arm64-v8a';p.mkdir(parents=True,exist_ok=True)
 source=Path(os.environ.get('CARGO_TARGET_DIR','target'))/'aarch64-linux-android/release/libnexus_lab.so'
 shutil.copy2(source,p/'libnexus_lab.so');shutil.copy2(Path(os.environ['NEXUS_SDK_PACKAGE'])/'libnexus_sdk.so',p/'libnexus_sdk.so')
-x=json.loads((r/'SDK_IDENTITY.json').read_text());assert hashlib.sha256((p/'libnexus_sdk.so').read_bytes()).hexdigest()==x['sdk_sha256']
+x=json.loads((r/'SDK_IDENTITY.json').read_text())
+if hashlib.sha256((p/'libnexus_sdk.so').read_bytes()).hexdigest()!=x['sdk_sha256']:
+    raise SystemExit('Staged SDK library differs from imported identity')
 x['bridge_sha256']=hashlib.sha256(source.read_bytes()).hexdigest()
 a=r/'app/src/main/assets';a.mkdir(parents=True,exist_ok=True);(a/'sdk-identity.json').write_text(json.dumps(x,indent=2)+'\n')
 PY

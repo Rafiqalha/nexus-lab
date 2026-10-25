@@ -34,6 +34,12 @@ Build assets bind the bridge/library hashes; Android hashes the extracted files 
 loads those exact absolute paths before opening a session. These hashes identify build
 bytes, not signed provenance or execution/hardware attestation.
 
+The importer verifies every manifest-listed file, refuses unlisted files and checks the immutable
+vendor identity before changing generated sources. It replaces the dependency-license tree as one
+complete set so an older package cannot leave stale notices behind. Gradle `preBuild` independently
+matches the staged identity, both native libraries, package manifest, source and profile; invoking
+Gradle directly therefore cannot silently package a leftover SDK from an earlier import.
+
 Release APK: `app/build/outputs/apk/release/app-release.apk`. Debug APK is also built; device instrumentation targets the signed lab release APK itself. **Lab release uses the local Android debug signing key for installation**;
 it is not a production release/distribution certificate. Both package a release Rust
 bridge and the same release SDK. No signing key is committed. Notices/licenses from
