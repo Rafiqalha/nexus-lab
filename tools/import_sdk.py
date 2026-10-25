@@ -6,7 +6,9 @@ import json,re,sys,hashlib,shutil
 from pathlib import Path
 root=Path(__file__).resolve().parents[1]
 p=Path(sys.argv[1]).resolve(); sha=sys.argv[2]
-m=json.loads((p/'MANIFEST.json').read_text());assert m['target']=='aarch64-linux-android' and m['features'] in [[],['staging-enrollment']] and not m['production_approved']
+m=json.loads((p/'MANIFEST.json').read_text())
+if m.get('source_commit') != sha or m.get('source_dirty') is not False:raise SystemExit('SDK package must identify the supplied clean source commit')
+assert m['target']=='aarch64-linux-android' and m['features'] in [[],['staging-enrollment']] and not m['production_approved']
 if m['features'] and '--staging' not in sys.argv:raise SystemExit('Staging import requires explicit --staging')
 lib=p/'libnexus_sdk.so'; digest=hashlib.sha256(lib.read_bytes()).hexdigest();assert digest==m['binary_audit']['sha256'];assert len(m['binary_audit']['exports'])==60
 header=p/'include/nexus/nexus_v2.h'

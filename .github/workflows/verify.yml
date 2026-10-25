@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: Rafiqalha/nexus-sdk
-          ref: 82b73a13a40d466aaa2aa236c433d57896036918
+          ref: 91845610d2c699ab0ccfc4a9835aa5499e0b2036
           ssh-key: ${{ secrets.NEXUS_SDK_READ_KEY }}
           path: nexus-sdk
           fetch-depth: 0

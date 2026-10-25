@@ -18,6 +18,14 @@ class EnrollmentStatusTest {
         assertTrue(EnrollmentStatus.refusal("revocation_unavailable_or_stale").contains("retained"))
         assertTrue(EnrollmentStatus.refusal("unknown_service_error").contains("retained"))
     }
+    @Test fun overloadAndStorageFailureRetainEnrollment() {
+        for (code in listOf("service_busy", "challenge_rate_limited", "body_timeout")) {
+            assertTrue(EnrollmentStatus.refusal(code).contains("existing enrollment"))
+            assertTrue(EnrollmentStatus.refusal(code).contains("No key was replaced"))
+        }
+        assertTrue(EnrollmentStatus.refusal("journal_capacity").contains("operator"))
+        assertTrue(EnrollmentStatus.refusal("storage_unavailable").contains("retained"))
+    }
     @Test fun expiredGrantNeedsFreshSessionWithoutReset() {
         assertTrue(EnrollmentStatus.refusal("grant_expired").contains("existing enrollment"))
     }

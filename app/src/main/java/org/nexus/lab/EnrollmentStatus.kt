@@ -19,6 +19,10 @@ internal object EnrollmentStatus {
             "Authorization expired; request a fresh session using the existing enrollment."
         "enrollment_not_found" ->
             "Enrollment is unavailable on the service; verify the service database before an explicit local reset."
+        "service_busy", "challenge_rate_limited", "body_timeout", "body_read_failed" ->
+            "Service busy or request interrupted; retry after a short delay using the existing enrollment. No key was replaced."
+        "journal_capacity", "challenge_storage_capacity", "authorization_capacity", "capture_challenge_capacity", "storage_unavailable" ->
+            "Service storage unavailable; ask the operator to check readiness and journal capacity. Local enrollment is retained."
         "revocation_unavailable_or_stale" ->
             "Service trust data unavailable; retry after the operator refreshes it. Local enrollment is retained."
         else -> "Staging request refused ($code); local enrollment is retained."

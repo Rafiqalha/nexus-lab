@@ -1,11 +1,20 @@
 [
   {
-    "name": "base16ct",
-    "version": "0.2.0",
+    "name": "autocfg",
+    "version": "1.5.1",
     "declared_license": "Apache-2.0 OR MIT",
     "files": [
-      "base16ct-0.2.0/LICENSE-MIT",
-      "base16ct-0.2.0/LICENSE-APACHE"
+      "autocfg-1.5.1/LICENSE-APACHE",
+      "autocfg-1.5.1/LICENSE-MIT"
+    ]
+  },
+  {
+    "name": "base16ct",
+    "version": "1.0.0",
+    "declared_license": "Apache-2.0 OR MIT",
+    "files": [
+      "base16ct-1.0.0/LICENSE-APACHE",
+      "base16ct-1.0.0/LICENSE-MIT"
     ]
   },
   {
@@ -28,11 +37,11 @@
   },
   {
     "name": "block-buffer",
-    "version": "0.10.4",
+    "version": "0.12.1",
     "declared_license": "MIT OR Apache-2.0",
     "files": [
-      "block-buffer-0.10.4/LICENSE-MIT",
-      "block-buffer-0.10.4/LICENSE-APACHE"
+      "block-buffer-0.12.1/LICENSE-APACHE",
+      "block-buffer-0.12.1/LICENSE-MIT"
     ]
   },
   {
@@ -61,6 +70,15 @@
     ]
   },
   {
+    "name": "cmov",
+    "version": "0.5.4",
+    "declared_license": "Apache-2.0 OR MIT",
+    "files": [
+      "cmov-0.5.4/LICENSE-APACHE",
+      "cmov-0.5.4/LICENSE-MIT"
+    ]
+  },
+  {
     "name": "combine",
     "version": "4.6.9",
     "declared_license": "MIT",
@@ -70,119 +88,138 @@
   },
   {
     "name": "const-oid",
-    "version": "0.9.6",
+    "version": "0.10.2",
     "declared_license": "Apache-2.0 OR MIT",
     "files": [
-      "const-oid-0.9.6/LICENSE-MIT",
-      "const-oid-0.9.6/LICENSE-APACHE"
+      "const-oid-0.10.2/LICENSE-APACHE",
+      "const-oid-0.10.2/LICENSE-MIT"
+    ]
+  },
+  {
+    "name": "cpubits",
+    "version": "0.1.1",
+    "declared_license": "MIT OR Apache-2.0",
+    "files": [
+      "cpubits-0.1.1/LICENSE-APACHE",
+      "cpubits-0.1.1/LICENSE-MIT"
     ]
   },
   {
     "name": "cpufeatures",
-    "version": "0.2.17",
+    "version": "0.3.1",
     "declared_license": "MIT OR Apache-2.0",
     "files": [
-      "cpufeatures-0.2.17/LICENSE-MIT",
-      "cpufeatures-0.2.17/LICENSE-APACHE"
+      "cpufeatures-0.3.1/LICENSE-APACHE",
+      "cpufeatures-0.3.1/LICENSE-MIT"
     ]
   },
   {
     "name": "crypto-bigint",
-    "version": "0.5.5",
+    "version": "0.7.7",
     "declared_license": "Apache-2.0 OR MIT",
     "files": [
-      "crypto-bigint-0.5.5/LICENSE-MIT",
-      "crypto-bigint-0.5.5/LICENSE-APACHE"
+      "crypto-bigint-0.7.7/LICENSE-APACHE",
+      "crypto-bigint-0.7.7/LICENSE-MIT"
     ]
   },
   {
     "name": "crypto-common",
-    "version": "0.1.6",
+    "version": "0.2.2",
     "declared_license": "MIT OR Apache-2.0",
     "files": [
-      "crypto-common-0.1.6/LICENSE-MIT",
-      "crypto-common-0.1.6/LICENSE-APACHE"
+      "crypto-common-0.2.2/LICENSE-APACHE",
+      "crypto-common-0.2.2/LICENSE-MIT"
+    ]
+  },
+  {
+    "name": "ctutils",
+    "version": "0.4.5",
+    "declared_license": "Apache-2.0 OR MIT",
+    "files": [
+      "ctutils-0.4.5/LICENSE-APACHE",
+      "ctutils-0.4.5/LICENSE-MIT"
     ]
   },
   {
     "name": "der",
-    "version": "0.7.10",
+    "version": "0.8.2",
     "declared_license": "Apache-2.0 OR MIT",
     "files": [
-      "der-0.7.10/LICENSE-MIT",
-      "der-0.7.10/LICENSE-APACHE"
+      "der-0.8.2/LICENSE-APACHE",
+      "der-0.8.2/LICENSE-MIT"
     ]
   },
   {
     "name": "digest",
-    "version": "0.10.7",
+    "version": "0.11.3",
     "declared_license": "MIT OR Apache-2.0",
     "files": [
-      "digest-0.10.7/LICENSE-MIT",
-      "digest-0.10.7/LICENSE-APACHE"
+      "digest-0.11.3/LICENSE-APACHE",
+      "digest-0.11.3/LICENSE-MIT"
     ]
   },
   {
     "name": "ecdsa",
-    "version": "0.16.9",
+    "version": "0.17.0",
     "declared_license": "Apache-2.0 OR MIT",
     "files": [
-      "ecdsa-0.16.9/LICENSE-MIT",
-      "ecdsa-0.16.9/LICENSE-APACHE"
+      "ecdsa-0.17.0/LICENSE-APACHE",
+      "ecdsa-0.17.0/LICENSE-MIT"
     ]
   },
   {
     "name": "elliptic-curve",
-    "version": "0.13.8",
+    "version": "0.14.2",
     "declared_license": "Apache-2.0 OR MIT",
     "files": [
-      "elliptic-curve-0.13.8/LICENSE-MIT",
-      "elliptic-curve-0.13.8/LICENSE-APACHE"
+      "elliptic-curve-0.14.2/LICENSE-APACHE",
+      "elliptic-curve-0.14.2/LICENSE-MIT"
     ]
   },
   {
     "name": "ff",
-    "version": "0.13.1",
+    "version": "0.14.0",
     "declared_license": "MIT/Apache-2.0",
     "files": [
-      "ff-0.13.1/LICENSE-MIT",
-      "ff-0.13.1/LICENSE-APACHE"
-    ]
-  },
-  {
-    "name": "generic-array",
-    "version": "0.14.9",
-    "declared_license": "MIT",
-    "files": [
-      "generic-array-0.14.9/LICENSE"
+      "ff-0.14.0/LICENSE-APACHE",
+      "ff-0.14.0/LICENSE-MIT"
     ]
   },
   {
     "name": "getrandom",
-    "version": "0.2.17",
+    "version": "0.4.3",
     "declared_license": "MIT OR Apache-2.0",
     "files": [
-      "getrandom-0.2.17/LICENSE-MIT",
-      "getrandom-0.2.17/LICENSE-APACHE"
+      "getrandom-0.4.3/LICENSE-APACHE",
+      "getrandom-0.4.3/LICENSE-MIT"
     ]
   },
   {
     "name": "group",
-    "version": "0.13.0",
+    "version": "0.14.0",
     "declared_license": "MIT/Apache-2.0",
     "files": [
-      "group-0.13.0/LICENSE-MIT",
-      "group-0.13.0/LICENSE-APACHE",
-      "group-0.13.0/COPYRIGHT"
+      "group-0.14.0/COPYRIGHT",
+      "group-0.14.0/LICENSE-APACHE",
+      "group-0.14.0/LICENSE-MIT"
     ]
   },
   {
     "name": "hmac",
-    "version": "0.12.1",
+    "version": "0.13.0",
     "declared_license": "MIT OR Apache-2.0",
     "files": [
-      "hmac-0.12.1/LICENSE-MIT",
-      "hmac-0.12.1/LICENSE-APACHE"
+      "hmac-0.13.0/LICENSE-APACHE",
+      "hmac-0.13.0/LICENSE-MIT"
+    ]
+  },
+  {
+    "name": "hybrid-array",
+    "version": "0.4.15",
+    "declared_license": "MIT OR Apache-2.0",
+    "files": [
+      "hybrid-array-0.4.15/LICENSE-APACHE",
+      "hybrid-array-0.4.15/LICENSE-MIT"
     ]
   },
   {
@@ -258,30 +295,57 @@
     ]
   },
   {
+    "name": "num-traits",
+    "version": "0.2.19",
+    "declared_license": "MIT OR Apache-2.0",
+    "files": [
+      "num-traits-0.2.19/LICENSE-APACHE",
+      "num-traits-0.2.19/LICENSE-MIT"
+    ]
+  },
+  {
+    "name": "once_cell",
+    "version": "1.21.4",
+    "declared_license": "MIT OR Apache-2.0",
+    "files": [
+      "once_cell-1.21.4/LICENSE-APACHE",
+      "once_cell-1.21.4/LICENSE-MIT"
+    ]
+  },
+  {
     "name": "p256",
-    "version": "0.13.2",
+    "version": "0.14.0",
     "declared_license": "Apache-2.0 OR MIT",
     "files": [
-      "p256-0.13.2/LICENSE-MIT",
-      "p256-0.13.2/LICENSE-APACHE"
+      "p256-0.14.0/LICENSE-APACHE",
+      "p256-0.14.0/LICENSE-MIT"
     ]
   },
   {
     "name": "pkcs8",
-    "version": "0.10.2",
+    "version": "0.11.0",
     "declared_license": "Apache-2.0 OR MIT",
     "files": [
-      "pkcs8-0.10.2/LICENSE-MIT",
-      "pkcs8-0.10.2/LICENSE-APACHE"
+      "pkcs8-0.11.0/LICENSE-APACHE",
+      "pkcs8-0.11.0/LICENSE-MIT"
+    ]
+  },
+  {
+    "name": "primefield",
+    "version": "0.14.0",
+    "declared_license": "Apache-2.0 OR MIT",
+    "files": [
+      "primefield-0.14.0/LICENSE-APACHE",
+      "primefield-0.14.0/LICENSE-MIT"
     ]
   },
   {
     "name": "primeorder",
-    "version": "0.13.6",
+    "version": "0.14.0",
     "declared_license": "Apache-2.0 OR MIT",
     "files": [
-      "primeorder-0.13.6/LICENSE-MIT",
-      "primeorder-0.13.6/LICENSE-APACHE"
+      "primeorder-0.14.0/LICENSE-APACHE",
+      "primeorder-0.14.0/LICENSE-MIT"
     ]
   },
   {
@@ -304,21 +368,21 @@
   },
   {
     "name": "rand_core",
-    "version": "0.6.4",
+    "version": "0.10.1",
     "declared_license": "MIT OR Apache-2.0",
     "files": [
-      "rand_core-0.6.4/LICENSE-MIT",
-      "rand_core-0.6.4/LICENSE-APACHE",
-      "rand_core-0.6.4/COPYRIGHT"
+      "rand_core-0.10.1/COPYRIGHT",
+      "rand_core-0.10.1/LICENSE-APACHE",
+      "rand_core-0.10.1/LICENSE-MIT"
     ]
   },
   {
     "name": "rfc6979",
-    "version": "0.4.0",
+    "version": "0.6.0",
     "declared_license": "Apache-2.0 OR MIT",
     "files": [
-      "rfc6979-0.4.0/LICENSE-MIT",
-      "rfc6979-0.4.0/LICENSE-APACHE"
+      "rfc6979-0.6.0/LICENSE-APACHE",
+      "rfc6979-0.6.0/LICENSE-MIT"
     ]
   },
   {
@@ -341,11 +405,20 @@
   },
   {
     "name": "sec1",
-    "version": "0.7.3",
+    "version": "0.8.1",
     "declared_license": "Apache-2.0 OR MIT",
     "files": [
-      "sec1-0.7.3/LICENSE-MIT",
-      "sec1-0.7.3/LICENSE-APACHE"
+      "sec1-0.8.1/LICENSE-APACHE",
+      "sec1-0.8.1/LICENSE-MIT"
+    ]
+  },
+  {
+    "name": "serde",
+    "version": "1.0.229",
+    "declared_license": "MIT OR Apache-2.0",
+    "files": [
+      "serde-1.0.229/LICENSE-APACHE",
+      "serde-1.0.229/LICENSE-MIT"
     ]
   },
   {
@@ -367,30 +440,39 @@
     ]
   },
   {
+    "name": "serdect",
+    "version": "0.4.3",
+    "declared_license": "Apache-2.0 OR MIT",
+    "files": [
+      "serdect-0.4.3/LICENSE-APACHE",
+      "serdect-0.4.3/LICENSE-MIT"
+    ]
+  },
+  {
     "name": "sha2",
-    "version": "0.10.9",
+    "version": "0.11.1",
     "declared_license": "MIT OR Apache-2.0",
     "files": [
-      "sha2-0.10.9/LICENSE-MIT",
-      "sha2-0.10.9/LICENSE-APACHE"
+      "sha2-0.11.1/LICENSE-APACHE",
+      "sha2-0.11.1/LICENSE-MIT"
     ]
   },
   {
     "name": "signature",
-    "version": "2.2.0",
+    "version": "3.0.0",
     "declared_license": "Apache-2.0 OR MIT",
     "files": [
-      "signature-2.2.0/LICENSE-MIT",
-      "signature-2.2.0/LICENSE-APACHE"
+      "signature-3.0.0/LICENSE-APACHE",
+      "signature-3.0.0/LICENSE-MIT"
     ]
   },
   {
     "name": "spki",
-    "version": "0.7.3",
+    "version": "0.8.1",
     "declared_license": "Apache-2.0 OR MIT",
     "files": [
-      "spki-0.7.3/LICENSE-MIT",
-      "spki-0.7.3/LICENSE-APACHE"
+      "spki-0.8.1/LICENSE-APACHE",
+      "spki-0.8.1/LICENSE-MIT"
     ]
   },
   {
@@ -449,21 +531,21 @@
     ]
   },
   {
-    "name": "version_check",
-    "version": "0.9.5",
-    "declared_license": "MIT/Apache-2.0",
-    "files": [
-      "version_check-0.9.5/LICENSE-MIT",
-      "version_check-0.9.5/LICENSE-APACHE"
-    ]
-  },
-  {
     "name": "walkdir",
     "version": "2.5.0",
     "declared_license": "Unlicense/MIT",
     "files": [
       "walkdir-2.5.0/LICENSE-MIT",
       "walkdir-2.5.0/COPYING"
+    ]
+  },
+  {
+    "name": "wnaf",
+    "version": "0.14.1",
+    "declared_license": "Apache-2.0 OR MIT",
+    "files": [
+      "wnaf-0.14.1/LICENSE-APACHE",
+      "wnaf-0.14.1/LICENSE-MIT"
     ]
   },
   {
