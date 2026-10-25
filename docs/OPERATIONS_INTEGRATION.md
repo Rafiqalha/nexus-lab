@@ -1,9 +1,10 @@
 # Staging service operations integration
 
 The SDK importer now requires the manifest to name the supplied clean SDK commit.
-It rejects a mismatched SHA before writing bindings or vendor assets. SDK runtime source
-is pinned at 91845610d2c699ab0ccfc4a9835aa5499e0b2036; later SDK acceptance-report-only
-commits can have the same source digest without changing this immutable package identity.
+It rejects a mismatched SHA before writing bindings or vendor assets. SDK runtime crate bytes remain at verified commit9184561; current package tooling is
+pinned at 4b8a8ad5cd08da8799636b4391173d0d7eb8c4b3 and emits explicit SPDX alternatives.
+Vendor directory identity includes both binary and manifest hashes, so a new source/metadata
+package with identical library bytes cannot collide with an older immutable import.
 
 The lab retains its enrollment/key on service overload, issuance quota, interrupted body
 or storage unavailability. Retry overload after a short delay using the existing enrollment;

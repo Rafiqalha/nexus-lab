@@ -17,7 +17,7 @@ hash_header=hashlib.sha256(header.read_bytes()).hexdigest()
 assert any(f['path']==header.name and f['sha256']==hash_header for f in m['files'])
 import subprocess
 subprocess.run([sys.executable,str(root/"tools/generate_bindings.py"),str(header)],check=True)
-v=root/('vendor/android-arm64-'+('staging-' if m['features'] else 'default-')+m['binary_audit']['sha256'][:12]);v.parent.mkdir(exist_ok=True)
+v=root/('vendor/android-arm64-'+('staging-' if m['features'] else 'default-')+m['binary_audit']['sha256'][:12]+'-'+hashlib.sha256((p/'MANIFEST.json').read_bytes()).hexdigest()[:12]);v.parent.mkdir(exist_ok=True)
 if v.exists():raise SystemExit('Refuse overwrite vendor package; select a fresh lab/import')
 shutil.copytree(p,v)
 (root/'SDK_IDENTITY.json').write_text(json.dumps({'source_sha':sha,'source_digest':m['source_digest'],'target':m['target'],'staging_root_public_key':m.get('staging_root_public_key'),'profile':'staging-enrollment' if m['features'] else 'default-preview','abi':'2.11','package_directory':str(v.relative_to(root)),'exports':60,'sdk_sha256':digest,'header_sha256':hash_header,'package_manifest_sha256':hashlib.sha256((p/'MANIFEST.json').read_bytes()).hexdigest()},indent=2)+'\n')
