@@ -12,14 +12,18 @@ Baseline lab: `e393c1c4eeb1d96070f5ea1197a21c9d16f6ac71`.
 | nexus-enrollment | Enrollment/PoP, verifikasi evidence, normalisasi, policy dan grants |
 
 Rancangan pusat: `Rafiqalha/nexus-sdk`, commit dokumentasi
-`ebc211f82f3ade4213185ea907f3f4cdf2c2f36d`, folder `docs/security-platform/`.
+`3174ffa`, folder `docs/security-platform/`.
 Lihat terutama ARCHITECTURE.md, EVIDENCE_AND_COLLECTORS.md,
-BASELINE_AND_CORRECTIONS.md dan VALIDATION_AND_OPERATIONS.md di snapshot tersebut.
+MVP_SPEC.md, WIRE_CONTRACT_V1.md, POLICY_AND_RELEASE.md,
+BASELINE_AND_CORRECTIONS.md, VALIDATION_AND_OPERATIONS.md, dan DESIGN_CLOSURE.md.
 Referensi lintas repo ini bukan dependency build dan tidak mengubah SDK_IDENTITY.json.
 
-Dokumen lokal: [spesifikasi Android dan acceptance](ANDROID_PLAN.md).
+Dokumen lokal:
+- [Spesifikasi Android dan acceptance](ANDROID_PLAN.md)
+- [Handoff implementasi MVP-1](MVP_HANDOFF.md)
+
 Rancangan service counterpart: `nexus-enrollment/docs/security-platform/BACKEND_PLAN.md`
-pada branch pekerjaan `TES123`; belum merupakan API yang sudah tersedia.
+dan `MVP_HANDOFF.md` pada branch pekerjaan `TES123`; belum merupakan API yang sudah tersedia.
 
 ## Status dan cara membaca
 
