@@ -1,6 +1,7 @@
 package org.nexus.lab.security
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
@@ -21,6 +22,36 @@ class CollectorCoordinatorTest {
         assertEquals("lab-android-v1", Observation.VERSION)
         assertEquals(4, report.checks.size)
         assertTrue(report.summary().contains("no_known_indicator"))
+    }
+
+    @Test fun reportWireUsesSharedCanonicalOrderingAndActualCollectorVersion() {
+        val report = ObservationReport(Observation.IDS.map { id ->
+            Observation(
+                id = id,
+                execution = Observation.Execution.COMPLETED,
+                finding = Observation.Finding.NO_KNOWN_INDICATOR,
+                durationMs = 1,
+                ageMs = 0,
+            )
+        })
+        val canonical = String(ObservationWire.canonicalReport(report), Charsets.UTF_8)
+        assertEquals(
+            "{\"checks\":[{\"age_ms\":0,\"duration_ms\":1,\"execution\":\"completed\",\"finding\":\"no_known_indicator\",\"id\":\"android.app_identity\"},{\"age_ms\":0,\"duration_ms\":1,\"execution\":\"completed\",\"finding\":\"no_known_indicator\",\"id\":\"android.debugger\"},{\"age_ms\":0,\"duration_ms\":1,\"execution\":\"completed\",\"finding\":\"no_known_indicator\",\"id\":\"android.environment\"},{\"age_ms\":0,\"duration_ms\":1,\"execution\":\"completed\",\"finding\":\"no_known_indicator\",\"id\":\"native.process_indicators\"}],\"collector_version\":\"lab-android-v1\",\"schema\":1}",
+            canonical,
+        )
+        assertEquals("c5df01d14f22fbb550a9f57343f2d186740ced7d72aa712c658bfced3c6b59e6", ObservationWire.reportSha256(report))
+    }
+
+    @Test fun reportWireRejectsOutOfContractValuesBeforeDigesting() {
+        val invalid = ObservationReport(Observation.IDS.map { id ->
+            Observation(
+                id = id,
+                execution = Observation.Execution.COMPLETED,
+                finding = Observation.Finding.NO_KNOWN_INDICATOR,
+                durationMs = if (id == "android.app_identity") 2_001 else 1,
+            )
+        })
+        assertThrows(IllegalArgumentException::class.java) { ObservationWire.canonicalReport(invalid) }
     }
 
     @Test fun failureNeverTurnsIntoCleanFinding() {

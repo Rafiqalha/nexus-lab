@@ -33,6 +33,8 @@ Nama di bawah adalah calon struktur implementasi, bukan berkas yang sudah ada.
 
 - `Observation`: contract report schema 1, empat ID fixed, dan pemisahan execution
   dari finding.
+- `ObservationWire`: validasi batas report dan serialisasi canonical byte-sorted untuk
+  digest `report_sha256`; belum membangun request HTTP, PoP, provider token, atau grant.
 - `CollectorCoordinator`: maksimal dua worker, batas 500 ms/check dimulai saat check
   benar-benar mulai dieksekusi dan 1500 ms keseluruhan, cooperative cancellation, reject
   hasil terlambat, output berurutan. Queue wait tidak menghabiskan budget check sendiri.

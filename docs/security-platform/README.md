@@ -30,8 +30,8 @@ dan `MVP_HANDOFF.md` pada branch pekerjaan `TES123`; belum merupakan API yang su
 - [C] Fakta dari source yang diperiksa; [I] rancangan/inferensi; [S] hipotesis uji.
 - [C] Collector L1/L2 observasional telah diimplementasikan pada
   `app/src/main/java/org/nexus/lab/security/`: empat check lokal, maksimum dua
-  worker, deadline/cancellation, dan report client-reported. Release JVM unit suite
-  lokal lulus 17 test dengan `:app:verifySdk` dikecualikan karena package SDK immutable
+  worker, deadline/cancellation, report client-reported, serta canonical report digest
+  lokal. Release JVM unit suite lokal lulus 19 test dengan `:app:verifySdk` dikecualikan karena package SDK immutable
   belum distage. Ini bukan APK/package identity PASS, instrumentation PASS, provider
   adapter, atau enforcement.
 - Provider adapter, authenticated action transport, x86_64 consumer, APK identity-gated
