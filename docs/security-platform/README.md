@@ -28,8 +28,14 @@ dan `MVP_HANDOFF.md` pada branch pekerjaan `TES123`; belum merupakan API yang su
 ## Status dan cara membaca
 
 - [C] Fakta dari source yang diperiksa; [I] rancangan/inferensi; [S] hipotesis uji.
-- Dokumen ini tidak menyatakan collector, provider adapter, atau x86_64 consumer
-  telah diimplementasikan. Runtime build/test baru: NOT_RUN.
+- [C] Collector L1/L2 observasional telah diimplementasikan pada
+  `app/src/main/java/org/nexus/lab/security/`: empat check lokal, maksimum dua
+  worker, deadline/cancellation, dan report client-reported. Release JVM unit suite
+  lokal lulus 15 test dengan `:app:verifySdk` dikecualikan karena package SDK immutable
+  belum distage. Ini bukan APK/package identity PASS, instrumentation PASS, provider
+  adapter, atau enforcement.
+- Provider adapter, authenticated action transport, x86_64 consumer, APK identity-gated
+  build, instrumented/device test, dan hosted CI untuk SHA kandidat: NOT_RUN/BLOCKED.
 - Source baseline memiliki jalur enrollment dan verifikasi package identity;
   required security signals tambahan belum memiliki pipeline produksi lengkap.
 - Tidak ada klaim emulator/Frida pasti terdeteksi atau manusia terbukti dari TEE.
