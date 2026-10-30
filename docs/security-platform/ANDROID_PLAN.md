@@ -42,7 +42,7 @@ Nama di bawah adalah calon struktur implementasi, bukan berkas yang sudah ada.
   serta scan read-only `/proc/self/maps` maksimum 256 KiB/256 baris untuk dua indikator
   terbatas. Tidak memindai proses lain atau menulis sistem.
 - Secured capture menjalankan collector sebelum capture lease. Hasil hanya ditampilkan
-  sebagai `client_reported; not authorization`; belum dikirim karena endpoint action
+  sebagai `client_reported; not authorization` bersama `report_sha256` canonical; belum dikirim karena endpoint action
   terautentikasi/provider verifier belum tersedia.
 
 [C] Unit test mencakup schema/order, error menjadi `unknown`, timeout, bound concurrency

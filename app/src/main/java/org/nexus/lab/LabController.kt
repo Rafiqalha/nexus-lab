@@ -8,6 +8,7 @@ import androidx.camera.core.ImageProxy
 import org.json.JSONObject
 import org.nexus.lab.security.CollectorCoordinator
 import org.nexus.lab.security.ObservationCancellation
+import org.nexus.lab.security.ObservationWire
 import org.nexus.lab.security.PlatformCollectors
 import java.nio.ByteBuffer
 import java.util.concurrent.ExecutorService
@@ -70,7 +71,8 @@ class LabController(
                     observationCancellation = cancellation
                     val report = CollectorCoordinator(PlatformCollectors.supported(context)).collect(cancellation)
                     if (epoch.get() != t || cancellation.isCancelled()) { cleanup(); return@execute }
-                    observationStatus = "Local observations (client_reported; not authorization): ${report.summary()}"
+                    observationStatus = "Local observations (client_reported; not authorization): ${report.summary()}; " +
+                        "report_sha256=${ObservationWire.reportSha256(report)}"
                 } else {
                     session = Native.open()
                     enrollmentStatus = "PREVIEW: no enrollment or platform evidence"
