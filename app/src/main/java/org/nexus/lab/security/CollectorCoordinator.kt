@@ -9,6 +9,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 
 /** Cooperative cancellation shared with lifecycle owners. */
 class ObservationCancellation {
@@ -30,7 +31,7 @@ fun interface Collector {
 
 /**
  * Executes exactly the supported collector set, preserving contract order.
- * Individual time starts when submitted; total action time is bounded separately.
+ * Individual time starts when execution starts; total action time is bounded separately.
  * Late values are never published after timeout/cancellation.
  */
 class CollectorCoordinator(
@@ -40,6 +41,10 @@ class CollectorCoordinator(
     private val totalBudgetMs: Long = 1_500,
     private val executorFactory: (Int) -> ExecutorService = { size -> Executors.newFixedThreadPool(size) },
 ) {
+    private companion object {
+        const val START_POLL_MS = 10L
+    }
+
     init {
         require(collectors.keys == Observation.IDS.toSet())
         require(maxConcurrent in 1..2)
@@ -52,13 +57,17 @@ class CollectorCoordinator(
         val startedAt = System.nanoTime()
         val deadline = startedAt + TimeUnit.MILLISECONDS.toNanos(totalBudgetMs)
         val futures = linkedMapOf<String, Future<Observation>>()
-        val submittedAt = linkedMapOf<String, Long>()
+        val startedAtById = linkedMapOf<String, AtomicLong>()
         try {
             for (id in Observation.IDS) {
                 if (cancellation.isCancelled()) break
-                val future = executor.submit(Callable { collectors.getValue(id).collect(cancellation) })
+                val startedAt = AtomicLong(0)
+                val future = executor.submit(Callable {
+                    startedAt.compareAndSet(0, System.nanoTime())
+                    collectors.getValue(id).collect(cancellation)
+                })
                 futures[id] = future
-                submittedAt[id] = System.nanoTime()
+                startedAtById[id] = startedAt
                 cancellation.onCancel { future.cancel(true) }
             }
             val values = Observation.IDS.map { id ->
@@ -66,7 +75,7 @@ class CollectorCoordinator(
                 if (future == null || cancellation.isCancelled()) {
                     unresolved(id, Observation.Execution.NOT_COLLECTED, startedAt)
                 } else {
-                    resolve(id, future, submittedAt.getValue(id), deadline, cancellation)
+                    resolve(id, future, startedAtById.getValue(id), deadline, cancellation)
                 }
             }
             return ObservationReport(values)
@@ -81,35 +90,54 @@ class CollectorCoordinator(
     private fun resolve(
         id: String,
         future: Future<Observation>,
-        submittedAt: Long,
+        startedAt: AtomicLong,
         deadline: Long,
         cancellation: ObservationCancellation,
     ): Observation {
-        val now = System.nanoTime()
-        val perCheckDeadline = submittedAt + TimeUnit.MILLISECONDS.toNanos(checkBudgetMs)
-        val waitNanos = minOf(perCheckDeadline, deadline) - now
-        if (waitNanos <= 0 || cancellation.isCancelled()) {
-            future.cancel(true)
-            return unresolved(id, if (cancellation.isCancelled()) Observation.Execution.NOT_COLLECTED else Observation.Execution.TIMEOUT, submittedAt)
-        }
-        return try {
-            val observation = future.get(waitNanos, TimeUnit.NANOSECONDS)
-            require(observation.id == id)
-            observation
-        } catch (_: java.util.concurrent.TimeoutException) {
-            future.cancel(true)
-            unresolved(id, Observation.Execution.TIMEOUT, submittedAt)
-        } catch (_: CancellationException) {
-            unresolved(id, Observation.Execution.NOT_COLLECTED, submittedAt)
-        } catch (_: InterruptedException) {
-            Thread.currentThread().interrupt()
-            cancellation.cancel()
-            future.cancel(true)
-            unresolved(id, Observation.Execution.NOT_COLLECTED, submittedAt)
-        } catch (_: ExecutionException) {
-            unresolved(id, Observation.Execution.ERROR, submittedAt)
-        } catch (_: IllegalArgumentException) {
-            unresolved(id, Observation.Execution.ERROR, submittedAt)
+        while (true) {
+            val now = System.nanoTime()
+            val actualStart = startedAt.get()
+            val perCheckDeadline = if (actualStart == 0L) {
+                deadline
+            } else {
+                minOf(actualStart + TimeUnit.MILLISECONDS.toNanos(checkBudgetMs), deadline)
+            }
+            val waitNanos = perCheckDeadline - now
+            if (waitNanos <= 0 || cancellation.isCancelled()) {
+                future.cancel(true)
+                return unresolved(
+                    id,
+                    if (cancellation.isCancelled()) Observation.Execution.NOT_COLLECTED else Observation.Execution.TIMEOUT,
+                    actualStart.takeIf { it != 0L } ?: now,
+                )
+            }
+            try {
+                val pollNanos = if (actualStart == 0L) {
+                    minOf(waitNanos, TimeUnit.MILLISECONDS.toNanos(START_POLL_MS))
+                } else {
+                    waitNanos
+                }
+                val observation = future.get(pollNanos, TimeUnit.NANOSECONDS)
+                require(observation.id == id)
+                return observation
+            } catch (_: java.util.concurrent.TimeoutException) {
+                val observedStart = startedAt.get()
+                if (actualStart == 0L && observedStart != 0L) continue
+                if (observedStart == 0L && System.nanoTime() < deadline) continue
+                future.cancel(true)
+                return unresolved(id, Observation.Execution.TIMEOUT, observedStart.takeIf { it != 0L } ?: now)
+            } catch (_: CancellationException) {
+                return unresolved(id, Observation.Execution.NOT_COLLECTED, actualStart.takeIf { it != 0L } ?: now)
+            } catch (_: InterruptedException) {
+                Thread.currentThread().interrupt()
+                cancellation.cancel()
+                future.cancel(true)
+                return unresolved(id, Observation.Execution.NOT_COLLECTED, actualStart.takeIf { it != 0L } ?: now)
+            } catch (_: ExecutionException) {
+                return unresolved(id, Observation.Execution.ERROR, actualStart.takeIf { it != 0L } ?: now)
+            } catch (_: IllegalArgumentException) {
+                return unresolved(id, Observation.Execution.ERROR, actualStart.takeIf { it != 0L } ?: now)
+            }
         }
     }
 

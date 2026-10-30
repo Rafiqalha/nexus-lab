@@ -33,8 +33,9 @@ Nama di bawah adalah calon struktur implementasi, bukan berkas yang sudah ada.
 
 - `Observation`: contract report schema 1, empat ID fixed, dan pemisahan execution
   dari finding.
-- `CollectorCoordinator`: maksimal dua worker, batas 500 ms/check dan 1500 ms
-  keseluruhan, cooperative cancellation, reject hasil terlambat, output berurutan.
+- `CollectorCoordinator`: maksimal dua worker, batas 500 ms/check dimulai saat check
+  benar-benar mulai dieksekusi dan 1500 ms keseluruhan, cooperative cancellation, reject
+  hasil terlambat, output berurutan. Queue wait tidak menghabiskan budget check sendiri.
 - `PlatformCollectors`: `app_identity`, debugger + `TracerPid`, environment terbatas,
   serta scan read-only `/proc/self/maps` maksimum 256 KiB/256 baris untuk dua indikator
   terbatas. Tidak memindai proses lain atau menulis sistem.

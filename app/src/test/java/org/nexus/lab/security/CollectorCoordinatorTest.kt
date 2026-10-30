@@ -68,6 +68,51 @@ class CollectorCoordinatorTest {
         assertEquals(4, report.checks.size)
     }
 
+    @Test fun queuedCollectorsReceiveTheirOwnExecutionBudget() {
+        val active = AtomicInteger()
+        val peak = AtomicInteger()
+        val report = CollectorCoordinator(
+            collectors { id ->
+                val now = active.incrementAndGet()
+                peak.getAndUpdate { previous -> maxOf(previous, now) }
+                try {
+                    Thread.sleep(
+                        if (id == "android.app_identity" || id == "android.debugger") 220 else 120,
+                    )
+                    observation(id)
+                } finally {
+                    active.decrementAndGet()
+                }
+            },
+            maxConcurrent = 2,
+            checkBudgetMs = 300,
+            totalBudgetMs = 1_500,
+        ).collect()
+        assertTrue(peak.get() <= 2)
+        assertTrue(report.summary(), report.checks.all { it.execution == Observation.Execution.COMPLETED })
+    }
+
+    @Test fun queuedCollectorCannotRunPastItsOwnExecutionBudget() {
+        val report = CollectorCoordinator(
+            collectors { id ->
+                Thread.sleep(
+                    when (id) {
+                        "android.app_identity", "android.debugger" -> 100
+                        "android.environment" -> 500
+                        else -> 20
+                    },
+                )
+                observation(id)
+            },
+            maxConcurrent = 2,
+            checkBudgetMs = 150,
+            totalBudgetMs = 1_500,
+        ).collect()
+        val queuedSlow = report.checks.single { it.id == "android.environment" }
+        assertEquals(report.summary(), Observation.Execution.TIMEOUT, queuedSlow.execution)
+        assertEquals(Observation.Finding.UNKNOWN, queuedSlow.finding)
+    }
+
     @Test fun preCancelledCollectionPublishesOnlyNotCollectedUnknown() {
         val cancellation = ObservationCancellation().also { it.cancel() }
         val invoked = AtomicInteger()
