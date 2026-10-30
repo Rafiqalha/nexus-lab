@@ -6,6 +6,9 @@ import android.os.Looper
 import android.os.SystemClock
 import androidx.camera.core.ImageProxy
 import org.json.JSONObject
+import org.nexus.lab.security.CollectorCoordinator
+import org.nexus.lab.security.ObservationCancellation
+import org.nexus.lab.security.PlatformCollectors
 import java.nio.ByteBuffer
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.atomic.AtomicLong
@@ -14,7 +17,11 @@ import java.util.concurrent.atomic.AtomicBoolean
 /** One worker owns all handles/buffers. Only cancellation crosses the worker boundary.
  * Epoch guards UI publication and start/stop races. Cleanup is queued behind in-flight JNI.
  */
-class LabController(private val worker: ExecutorService, private val publish: (String) -> Unit) {
+class LabController(
+    private val context: android.content.Context,
+    private val worker: ExecutorService,
+    private val publish: (String) -> Unit,
+) {
     private val main = Handler(Looper.getMainLooper())
     private val epoch = AtomicLong()
     private val cancellable = AtomicLong()
@@ -23,6 +30,8 @@ class LabController(private val worker: ExecutorService, private val publish: (S
     private var capture = 0L
     private var result = 0L
     private var enrollmentStatus = "PREVIEW: no enrollment or platform evidence"
+    @Volatile private var observationCancellation: ObservationCancellation? = null
+    private var observationStatus = "Local observations: NOT_COLLECTED (preview mode)"
     private var enrolled: Enrollment.DeviceSession? = null
     private var submissionAttempt = 0
     private var submissionStatus = "Server acceptance: not submitted"
@@ -49,6 +58,7 @@ class LabController(private val worker: ExecutorService, private val publish: (S
         val t = epoch.incrementAndGet()
         val previous = cancellable.getAndSet(0)
         if (previous != 0L) Native.cancel(previous)
+        observationCancellation?.cancel()
         worker.execute {
             cleanup()
             if (epoch.get() != t) return@execute
@@ -56,7 +66,16 @@ class LabController(private val worker: ExecutorService, private val publish: (S
             try {
                 if (secured) {
                     val opened = Enrollment.open(enrollNew); enrolled = opened; session = opened.handle; enrollmentStatus = opened.status
-                } else { session = Native.open(); enrollmentStatus = "PREVIEW: no enrollment or platform evidence" }
+                    val cancellation = ObservationCancellation()
+                    observationCancellation = cancellation
+                    val report = CollectorCoordinator(PlatformCollectors.supported(context)).collect(cancellation)
+                    if (epoch.get() != t || cancellation.isCancelled()) { cleanup(); return@execute }
+                    observationStatus = "Local observations (client_reported; not authorization): ${report.summary()}"
+                } else {
+                    session = Native.open()
+                    enrollmentStatus = "PREVIEW: no enrollment or platform evidence"
+                    observationStatus = "Local observations: NOT_COLLECTED (preview mode)"
+                }
                 submissionAttempt = 0
                 submissionStatus = "Server acceptance: not submitted"
                 capture = enrolled?.createCapture() ?: Native.create(session)
@@ -78,6 +97,7 @@ class LabController(private val worker: ExecutorService, private val publish: (S
         val t = epoch.incrementAndGet()
         val active = cancellable.getAndSet(0)
         if (active != 0L) Native.cancel(active)
+        observationCancellation?.cancel()
         emit(t, "$reason\nPrevious result is no longer current. Tap Start for a new capture.")
         worker.execute { cleanup() }
     }
@@ -90,10 +110,11 @@ class LabController(private val worker: ExecutorService, private val publish: (S
         cancellable.compareAndSet(capture, 0)
         if (session != 0L || capture != 0L || result != 0L) Native.release(session, capture, result)
         enrolled?.close(); enrolled = null
+        observationCancellation = null
         session = 0; capture = 0; result = 0
         pixels?.let { FrameAdapter.wipe(it) }; key = null
     }
-    private fun report(snapshot: JSONObject): String = "$enrollmentStatus\n$submissionStatus\n" +
+    private fun report(snapshot: JSONObject): String = "$enrollmentStatus\n$observationStatus\n$submissionStatus\n" +
         "Enrollment metadata is historical; current_result_valid controls current result use.\n" + snapshot.toString(2) +
         "\nAdapter pack: ${adapter.summary()}\nSDK/JNI submit: ${sdk.summary()}\nAnalyzer incl wipe/close: ${analyzer.summary()}\n" +
         "$lastFrame\ndelivered=$delivered submitted=$submitted appSkipped=$skipped errors=$errors\nCameraX dropped frames: UNKNOWN (not exposed by KEEP_ONLY_LATEST)"

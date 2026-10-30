@@ -26,6 +26,26 @@ Nama di bawah adalah calon struktur implementasi, bukan berkas yang sudah ada.
 | security/SecurityUiState | Pisahkan observed, verified, stale, unavailable dan decision |
 | Native adapter opsional | Own-process observations bila API yang tersedia memadai |
 
+## Pembaruan implementasi — 30 Oktober 2026
+
+[C] L1/L2 collector lokal tersedia pada branch `TES123` di
+`app/src/main/java/org/nexus/lab/security/`:
+
+- `Observation`: contract report schema 1, empat ID fixed, dan pemisahan execution
+  dari finding.
+- `CollectorCoordinator`: maksimal dua worker, batas 500 ms/check dan 1500 ms
+  keseluruhan, cooperative cancellation, reject hasil terlambat, output berurutan.
+- `PlatformCollectors`: `app_identity`, debugger + `TracerPid`, environment terbatas,
+  serta scan read-only `/proc/self/maps` maksimum 256 KiB/256 baris untuk dua indikator
+  terbatas. Tidak memindai proses lain atau menulis sistem.
+- Secured capture menjalankan collector sebelum capture lease. Hasil hanya ditampilkan
+  sebagai `client_reported; not authorization`; belum dikirim karena endpoint action
+  terautentikasi/provider verifier belum tersedia.
+
+[C] Unit test mencakup schema/order, error menjadi `unknown`, timeout, bound concurrency
+dan pre-cancel. Provider, transport `/v1/lab-security/*`, physical-device matrix dan
+APK signer-rotation tests tetap NOT_RUN.
+
 Tidak memasukkan private issuer key, provider server credentials, atau raw production
 root signing material ke aplikasi. Tidak menambahkan C++ hanya untuk scanner bila
 Rust/JNI yang ada cukup; evaluasi kebutuhan dependensi per kasus.

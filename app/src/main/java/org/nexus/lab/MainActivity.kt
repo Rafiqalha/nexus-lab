@@ -70,7 +70,7 @@ class MainActivity : ComponentActivity() {
         status = TextView(this).apply { text = "Loading verified SDK package…"; textSize = 12f; setTextIsSelectable(true) }
         root.addView(ScrollView(this).apply { addView(status) }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
         setContentView(root)
-        controller = LabController(worker) { status.text = it }
+        controller = LabController(applicationContext, worker) { status.text = it }
         worker.execute {
             try { val id = Native.load(this); runOnUiThread { loaded = true; status.text = "SDK loaded; tap Start.\n${if (BuildConfig.NEXUS_STAGING) Enrollment.describe() else "PREVIEW"}\n$id" } }
             catch (e: Throwable) { runOnUiThread { status.text = "Library load failed: ${e.message}" } }

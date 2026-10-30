@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "scope": "Windows local JVM unit test. Android collector L1/L2 only; local observations remain client_reported and are not authorization.",
+  "base_commit": "b5f14af2d81f2d6355b0d12012196a8bd4ab21de",
+  "commands": [
+    {
+      "command": "gradlew.bat :app:testReleaseUnitTest -x :app:verifySdk --no-daemon --rerun-tasks",
+      "exit": 0,
+      "result": "15 JVM unit tests; collector suite 6 tests, 0 failures, 0 errors. verifySdk intentionally excluded only because immutable SDK package is not staged locally."
+    },
+    {
+      "command": "gradlew.bat :app:testReleaseUnitTest --no-daemon",
+      "exit": 1,
+      "result": "BLOCKED at :app:verifySdk: Run tools/build_android.sh first. This is expected identity-gate enforcement, not a test pass."
+    }
+  ],
+  "not_run": [
+    "verified SDK package build",
+    "APK/instrumentation/device run",
+    "Google Play Integrity provider",
+    "authenticated action transport",
+    "live verifier",
+    "physical-device matrix"
+  ],
+  "sha256": {
+    "app/src/main/java/org/nexus/lab/LabController.kt": "903cec8848b405c84de57ffa18ebfa7fbe24d9ffde77ed2c7f6f31f864a739f1",
+    "app/src/main/java/org/nexus/lab/MainActivity.kt": "c228ea4c9814734f6d35dfdae554e30781b05bdb95259c38e520daaedc19effc",
+    "app/src/main/java/org/nexus/lab/security/Observation.kt": "1633d18fd37cbfb2716886279689a6e8562f31a7ef9397ed5a7f53f58752433b",
+    "app/src/main/java/org/nexus/lab/security/CollectorCoordinator.kt": "b602d60086784d5c638c9e4287e24b2a097cab83027a2e5287982baf9a029613",
+    "app/src/main/java/org/nexus/lab/security/PlatformCollectors.kt": "8a3807f077689aa40d8d87895d47509cc82e3424b7f68cad6cf69239e202c187",
+    "app/src/test/java/org/nexus/lab/security/CollectorCoordinatorTest.kt": "d1b85e913a3b0a6006e75cd3133c06144eaf58d47b822db45aa50e74839202eb",
+    "docs/security-platform/ANDROID_PLAN.md": "f101b7256eaad50540005a871f0c273b4b396ed118e3c245c57b17e74067e7c4"
+  }
+}
