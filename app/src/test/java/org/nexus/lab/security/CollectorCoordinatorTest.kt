@@ -43,15 +43,26 @@ class CollectorCoordinatorTest {
     }
 
     @Test fun reportWireRejectsOutOfContractValuesBeforeDigesting() {
-        val invalid = ObservationReport(Observation.IDS.map { id ->
+        fun invalid(check: (String) -> Observation): ObservationReport = ObservationReport(Observation.IDS.map(check))
+        val duration = invalid { id ->
             Observation(
                 id = id,
                 execution = Observation.Execution.COMPLETED,
                 finding = Observation.Finding.NO_KNOWN_INDICATOR,
                 durationMs = if (id == "android.app_identity") 2_001 else 1,
             )
-        })
-        assertThrows(IllegalArgumentException::class.java) { ObservationWire.canonicalReport(invalid) }
+        }
+        val age = invalid { id ->
+            Observation(
+                id = id,
+                execution = Observation.Execution.COMPLETED,
+                finding = Observation.Finding.NO_KNOWN_INDICATOR,
+                durationMs = 1,
+                ageMs = if (id == "android.app_identity") 5_001 else 0,
+            )
+        }
+        assertThrows(IllegalArgumentException::class.java) { ObservationWire.canonicalReport(duration) }
+        assertThrows(IllegalArgumentException::class.java) { ObservationWire.canonicalReport(age) }
     }
 
     @Test fun failureNeverTurnsIntoCleanFinding() {

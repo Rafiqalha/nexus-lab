@@ -45,7 +45,7 @@ Nama di bawah adalah calon struktur implementasi, bukan berkas yang sudah ada.
   sebagai `client_reported; not authorization` bersama `report_sha256` canonical; belum dikirim karena endpoint action
   terautentikasi/provider verifier belum tersedia.
 
-[C] Unit test mencakup schema/order, error menjadi `unknown`, timeout, bound concurrency
+[C] Unit test mencakup schema/order/canonical digest, duration/age bounds, error menjadi `unknown`, timeout, bound concurrency
 dan pre-cancel. Provider, transport `/v1/lab-security/*`, physical-device matrix dan
 APK signer-rotation tests tetap NOT_RUN.
 
